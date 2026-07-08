@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOI KADAI HARIAN N3 — Kuis Interaktif</title>
+<style>
+  :root{
+    --washi:#f7f3ea; --washi-deep:#efe7d6; --sumi:#252220; --sumi-soft:#5a534c;
+    --vermilion:#bc4a3c; --vermilion-deep:#9c3a2f; --gold:#b6904a; --indigo:#33495c;
+    --good:#3f7a5c; --bad:#bc4a3c; --line:#ddd3bd; --card:#fffdf8;
+    --shadow: 0 1px 2px rgba(37,34,32,.06), 0 8px 24px rgba(37,34,32,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP", "Zen Old Mincho", serif;
+    background: radial-gradient(1200px 600px at 85% -10%, #fbf6e9 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #f3ead2 0%, transparent 55%), var(--washi);
+    color:var(--sumi); min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  .stage{ max-width: 760px; margin: 0 auto; padding: 28px 18px 80px; }
+
+  .cover{ position:relative; border-radius:18px; padding: 30px 26px 26px;
+    background: linear-gradient(160deg, var(--indigo) 0%, #233140 100%);
+    color: #f4ead0; overflow:hidden; box-shadow: var(--shadow); margin-bottom: 22px; }
+  .cover::before{ content:""; position:absolute; inset:0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(244,234,208,.10) 1px, transparent 1px);
+    background-size: 16px 16px; opacity:.5; }
+  .cover .kicker{ position:relative; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; letter-spacing:.18em; font-size:11px; text-transform:uppercase; color: var(--gold); margin-bottom:10px; }
+  .cover h1{ position:relative; font-size: 25px; margin: 0 0 6px; line-height:1.4; font-weight: 600; }
+  .cover h1 .accent{ color:#e8b96a; }
+  .cover p.sub{ position:relative; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size: 13px; color:#cdd9e2; margin: 0 0 18px; line-height:1.7; }
+  .cover .stamp{ position:absolute; top:20px; right:22px; width:48px;height:48px; border:2px solid var(--vermilion); border-radius:8px; color:var(--vermilion); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; transform: rotate(-6deg); background: rgba(188,74,60,.07); }
+  .cover .meta-row{ position:relative; display:flex; gap:16px; flex-wrap:wrap; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:12px; color:#aebcc8; border-top:1px solid rgba(244,234,208,.18); padding-top:12px; margin-bottom: 4px;}
+  .cover .meta-row b{ color:#f4ead0; font-weight:600;}
+
+  .start-btn{ position:relative; margin-top:16px; display:inline-flex; align-items:center; gap:10px;
+    background: var(--vermilion); color:#fff7ec; border:none;
+    font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-weight:600; font-size:14px;
+    padding: 12px 20px; border-radius: 999px; cursor:pointer;
+    box-shadow: 0 6px 18px rgba(188,74,60,.35); transition: transform .15s ease, box-shadow .15s ease; }
+  .start-btn:hover{ transform: translateY(-1px); }
+
+  .top-tabs{ display:flex; gap:8px; margin-bottom:16px; }
+  .top-tabs button{ flex:1; border:1.5px solid var(--line); background:var(--card); border-radius:12px; padding:12px 8px;
+    font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-weight:700; font-size:13px;
+    color:var(--sumi-soft); cursor:pointer; transition:all .15s ease; }
+  .top-tabs button.active{ border-color:var(--vermilion); background:var(--vermilion); color:#fff7ec; }
+
+  .day-picker{ display:grid; grid-template-columns: repeat(6,1fr); gap:8px; margin-top:14px; }
+  .day-picker button{ border:1.5px solid var(--line); background:var(--card); border-radius:10px; padding:10px 4px;
+    font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--sumi-soft); cursor:pointer; transition: all .15s ease; }
+  .day-picker button:hover{ border-color:var(--gold); background:#fffaf0; }
+  .day-picker button.active{ border-color:var(--vermilion); background:var(--vermilion); color:#fff7ec; }
+
+  .mode-tabs{ display:flex; gap:8px; margin: 16px 0 4px; }
+  .mode-tabs button{ flex:1; border:1.5px solid var(--line); background:var(--card); border-radius:999px; padding:10px;
+    font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-weight:600; font-size:12.5px;
+    color:var(--sumi-soft); cursor:pointer; }
+  .mode-tabs button.active{ border-color:var(--indigo); background:var(--indigo); color:#fff; }
+
+  .cat-picker{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .cat-picker button{ border:1.5px solid var(--line); background:var(--card); border-radius:999px; padding:9px 14px;
+    font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--sumi-soft); cursor:pointer; }
+  .cat-picker button.active{ border-color:var(--vermilion); background:var(--vermilion); color:#fff7ec; }
+
+  .progress-wrap{ position: sticky; top:0; z-index:20; background: linear-gradient(var(--washi) 78%, transparent); padding: 10px 0 14px; margin-bottom: 6px; }
+  .progress-info{ display:flex; justify-content:space-between; align-items:baseline; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:12px; color:var(--sumi-soft); margin-bottom:6px; padding: 0 2px; }
+  .progress-info .sect-name{ color:var(--vermilion-deep); font-weight:700; letter-spacing:.02em;}
+  .progress-track{ height:6px; background:var(--washi-deep); border-radius:99px; overflow:hidden; border:1px solid var(--line); }
+  .progress-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--gold), var(--vermilion)); border-radius:99px; transition: width .4s cubic-bezier(.4,0,.2,1); }
+
+  .card{ background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px 24px 22px; box-shadow: var(--shadow); animation: rise .35s ease; }
+  @keyframes rise{ from{ opacity:0; transform: translateY(8px); } to{ opacity:1; transform: translateY(0); } }
+  .qnum{ display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:30px; padding:0 9px; background: var(--sumi); color: var(--washi); font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:13px; font-weight:700; border-radius:7px; margin-bottom:14px; }
+  .qtext{ font-size: 18px; line-height: 1.85; margin: 0 0 6px; }
+  .qtext u{ text-decoration-color: var(--vermilion); text-decoration-thickness:2px; text-underline-offset:3px; }
+  .qid{ font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:12.5px; color:var(--sumi-soft); font-style:italic; margin: 0 0 16px; line-height:1.6; }
+
+  .options{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .opt{ display:flex; align-items:flex-start; gap:12px; border:1.5px solid var(--line); border-radius:11px; padding: 13px 15px; cursor:pointer; background:#fffefb; transition: border-color .15s ease, background .15s ease; font-size:15px; line-height:1.6; }
+  .opt:hover{ border-color: var(--gold); background: #fffaf0; }
+  .opt .badge{ flex:0 0 auto; width:26px;height:26px; border-radius:50%; border:1.5px solid var(--sumi-soft); display:flex;align-items:center;justify-content:center; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:13px; font-weight:700; color:var(--sumi-soft); margin-top:1px; }
+  .opt.selected{ border-color: var(--indigo); background: #eef3f6; }
+  .opt.selected .badge{ background:var(--indigo); border-color:var(--indigo); color:#fff; }
+  .opt.correct{ border-color: var(--good); background: #eef6f0; }
+  .opt.correct .badge{ background:var(--good); border-color:var(--good); color:#fff; }
+  .opt.incorrect{ border-color: var(--bad); background: #faeeec; }
+  .opt.incorrect .badge{ background:var(--bad); border-color:var(--bad); color:#fff; }
+  .opt.disabled{ cursor:default; }
+
+  .feedback{ margin-top:16px; padding: 13px 15px; border-radius:10px; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:13.5px; line-height:1.75; display:none; }
+  .feedback.show{ display:block; animation: rise .25s ease; }
+  .feedback.ok{ background:#eef6f0; border:1px solid var(--good); color:#234a37; }
+  .feedback.ng{ background:#faeeec; border:1px solid var(--bad); color:#6e2a21; }
+  .feedback .tag{ font-weight:700; margin-right:6px; }
+  .fb-id{ margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,.08); font-style:italic; font-size:13px; color:inherit; opacity:.85; }
+
+  .navbar{ display:flex; justify-content:space-between; align-items:center; margin-top:22px; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; gap:8px; }
+  .nav-btn{ border:1.5px solid var(--sumi); background:transparent; color:var(--sumi); padding: 10px 16px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; transition: all .15s ease; white-space:nowrap; }
+  .nav-btn:hover:not(:disabled){ background:var(--sumi); color:var(--washi); }
+  .nav-btn:disabled{ opacity:.3; cursor:not-allowed; }
+  .nav-btn.primary{ border-color: var(--vermilion); background: var(--vermilion); color:#fff7ec; }
+  .nav-btn.primary:hover{ background: var(--vermilion-deep); }
+  .nav-btn.ghost{ border-color: var(--line); color: var(--sumi-soft); }
+
+  .jumpbar{ display:flex; flex-wrap:wrap; gap:5px; margin-top:18px; justify-content:center; max-height:120px; overflow-y:auto; padding:4px;}
+  .jumpbar button{ width:26px;height:26px; border-radius:6px; border:1px solid var(--line); background:var(--card); font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:10px; color:var(--sumi-soft); cursor:pointer; }
+  .jumpbar button.cur{ border-color:var(--indigo); color:var(--indigo); font-weight:700;}
+  .jumpbar button.done-ok{ background:#eef6f0; border-color:var(--good); color:var(--good); }
+  .jumpbar button.done-ng{ background:#faeeec; border-color:var(--bad); color:var(--bad); }
+
+  .result-card{ background: var(--card); border:1px solid var(--line); border-radius: 18px; padding: 34px 28px; text-align:center; box-shadow:var(--shadow); }
+  .result-card .ring{ width:150px;height:150px; margin: 6px auto 18px; position:relative; }
+  .result-card .ring svg{ transform: rotate(-90deg); }
+  .result-card .ring .pct{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; }
+  .result-card .ring .pct b{ font-size:30px; line-height:1; }
+  .result-card .ring .pct span{ font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:11px; color:var(--sumi-soft); margin-top:4px;}
+  .result-card h2{ margin:0 0 4px; font-size:22px; }
+  .result-card .comment{ font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:13.5px; color:var(--sumi-soft); margin-bottom:20px; }
+  .result-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .review-list{ text-align:left; margin-top:26px; }
+  .review-item{ border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px; }
+  .review-item .rq{ font-size:14px; margin-bottom:4px; }
+  .review-item .rid{ font-size:11.5px; color:var(--sumi-soft); font-style:italic; margin-bottom:6px; }
+  .review-item .ra{ font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:12px; }
+  .review-item .ra.ok{ color:var(--good); }
+  .review-item .ra.ng{ color:var(--bad); }
+
+  .hidden{ display:none !important; }
+
+  @media (max-width:480px){
+    .cover h1{ font-size:19px; }
+    .qtext{ font-size:16px; }
+    .card{ padding:20px 16px 18px; }
+    .day-picker{ grid-template-columns: repeat(5,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ===== COVER ===== -->
+  <div id="cover" class="cover">
+    <div class="stamp">N3</div>
+    <div class="kicker">Interactive Quiz</div>
+    <h1>GOI KADAI HARIAN N3<br><span class="accent">課題 ＋ 集中トレーニング</span></h1>
+    <p class="sub" id="coverSub">読み込み中...</p>
+    <div class="meta-row" id="coverMeta"></div>
+
+    <div class="top-tabs">
+      <button id="tabKadaiBtn" class="active" onclick="setTopTab('kadai')">課題 1〜30</button>
+      <button id="tabTrainingBtn" onclick="setTopTab('training')">集中トレーニング</button>
+    </div>
+
+    <!-- KADAI controls -->
+    <div id="kadaiControls">
+      <div class="mode-tabs">
+        <button id="modeAllBtn" class="active" onclick="setKadaiMode('all')">全課題まとめて挑戦</button>
+        <button id="modePickBtn" onclick="setKadaiMode('pick')">課題を選ぶ</button>
+      </div>
+      <div id="dayPickerWrap" class="hidden">
+        <div class="day-picker" id="dayPicker"></div>
+      </div>
+    </div>
+
+    <!-- TRAINING controls -->
+    <div id="trainingControls" class="hidden">
+      <div class="mode-tabs">
+        <button id="trAllBtn" class="active" onclick="setTrainingMode('all')">全カテゴリーまとめて挑戦</button>
+        <button id="trPickBtn" onclick="setTrainingMode('pick')">カテゴリーを選ぶ</button>
+      </div>
+      <div id="catPickerWrap" class="hidden">
+        <div class="cat-picker" id="catPicker"></div>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz()">▶ はじめる</button>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quizArea" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="sect-name" id="sectName">課題1</span>
+        <span id="progressText">1 / 1</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="card" id="card"></div>
+
+    <div class="navbar">
+      <button class="nav-btn ghost" onclick="backToCover()">← 選び直す</button>
+      <button class="nav-btn" id="prevBtn" onclick="goPrev()">前へ</button>
+      <button class="nav-btn primary" id="nextBtn" onclick="goNext()">次へ →</button>
+    </div>
+
+    <div class="jumpbar" id="jumpbar"></div>
+  </div>
+
+  <!-- ===== RESULT ===== -->
+  <div id="resultArea" class="hidden">
+    <div class="result-card">
+      <div class="ring">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="#efe7d6" stroke-width="12"/>
+          <circle id="ringFg" cx="75" cy="75" r="64" fill="none" stroke="#bc4a3c" stroke-width="12" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/>
+        </svg>
+        <div class="pct"><b id="scorePct">0%</b><span id="scoreFrac">0 / 0</span></div>
+      </div>
+      <h2 id="resultTitle">お疲れ様でした</h2>
+      <p class="comment" id="resultComment"></p>
+
+      <div class="result-actions">
+        <button class="nav-btn primary" onclick="showReview()">📖 解説を見る</button>
+        <button class="nav-btn" onclick="restartQuiz()">↻ もう一度</button>
+        <button class="nav-btn ghost" onclick="backToCover()">選び直す</button>
+      </div>
+
+      <div class="review-list hidden" id="reviewList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+// ===== KADAI DATA (final, underlined) =====
+const KADAI_PART1 = [
+{
+  day: 1,
+  groups: [
+    { label: "問題1", items: [
+      {q:"とても<u>悲しい</u>話を聞いた。（悲しい）", opts:["おかしい","かなしい","きびしい","さびしい"], ans:1, exp:"「悲しい」＝sedih（かなしい）。", id:"Saya mendengar cerita yang sangat sedih."},
+      {q:"家族とよく<u>相談</u>してから決めようと思う。", opts:["そたん","そだん","そうたん","そうだん"], ans:3, exp:"「相談」＝soudan, diskusi/konsultasi.", id:"Saya berpikir akan memutuskan setelah berdiskusi dengan keluarga dengan baik."},
+      {q:"来⽉の<u>旅⾏</u>が楽しみだ。", opts:["りょこ","りょうこ","りょこう","りこ"], ans:2, exp:"「旅⾏」＝ryokou, perjalanan.", id:"Saya menantikan perjalanan bulan depan."}
+    ]},
+    { label: "問題2", items: [
+      {q:"今⽇⼀⽇とても<u>つかれた</u>。", opts:["疲れた","病れた","症れた","痛れた"], ans:0, exp:"「つかれた」＝「疲れた」, lelah.", id:"Hari ini saya sangat lelah seharian."},
+      {q:"本棚には、外国の本がたくさん<u>ならんで</u>いた。", opts:["並んで","兆んで","挑んで","列んで"], ans:0, exp:"「ならんで」＝「並んで」, berjejer/berbaris.", id:"Di rak buku, banyak buku asing yang tersusun berjajar."},
+      {q:"⼀⼈暮らしに<u>ひつよう</u>な物を買いに⾏った。", opts:["必⽤","必容","必要","必有"], ans:2, exp:"「ひつよう」＝「必要」, dibutuhkan/perlu.", id:"Saya pergi membeli barang-barang yang diperlukan untuk hidup sendiri."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この映画は<u>かなり</u>おもしろかった。", opts:["すこし","ぜんぶ","とても","まあまあ"], ans:2, exp:"「かなり」＝cukup sangat ≈「とても」.", id:"Film ini cukup menarik."},
+      {q:"こちらにご<u>記⼊</u>ください。", opts:["書いて","⼊って","おぼえて","しまって"], ans:0, exp:"「記⼊・きにゅう」＝mengisi (formulir) ≈ 書いて.", id:"Silakan isi di sini."},
+      {q:"その仕事を私⼀⼈でやるのは<u>無理</u>だ。", opts:["いやだ","さびしい","できない","つまらない"], ans:2, exp:"「無理・むり」＝tidak mungkin ≈「できない」.", id:"Tidak mungkin saya mengerjakan pekerjaan itu sendirian."},
+      {q:"あの夫婦は<u>そっくり</u>だ。", opts:["仲がいい","似ている","太っている","よくけんかする"], ans:1, exp:"「そっくり」＝sangat mirip（似ている）.", id:"Pasangan suami istri itu sangat mirip."}
+    ]},
+    { label: "問題4", items: [
+      {q:"けさは6時に⽬が（　）。", opts:["あいた","さめた","ついた","ひらいた"], ans:1, exp:"「⽬がさめた」＝terbangun, paling tepat saat bangun tidur.", id:"Pagi ini saya bangun pukul enam."},
+      {q:"すみません。今⽇は⽤事があるので、また（　）さそってください。", opts:["今どき","今回","今後","今度"], ans:3, exp:"「今度さそってください」＝silakan ajak saya lain kali.", id:"Maaf, hari ini saya ada urusan, jadi tolong ajak saya lagi lain kali."},
+      {q:"⾷事が終わったら、テーブルをきれいに（　）ください。", opts:["かけて","はいて","ふいて","みがいて"], ans:2, exp:"「テーブルをふく」＝mengelap meja.", id:"Setelah makan selesai, tolong lap meja sampai bersih."},
+      {q:"あのデパートでは今、半額（　）をしている。", opts:["セール","ダウン","セールス","ブライス"], ans:0, exp:"「半額セール」＝diskon setengah harga.", id:"Di department store itu sekarang sedang ada diskon setengah harga."},
+      {q:"この本を読んだら、ぜひ（　）を聞かせてください。", opts:["感⼼","感覚","感想","感謝"], ans:2, exp:"「感想」＝kesan, pendapat setelah membaca.", id:"Setelah membaca buku ini, tolong ceritakan pendapatmu."},
+      {q:"簡単なことなのに、何度やってもうまくできなくて（　）する。", opts:["いらいら","うとうと","どきどき","はらはら"], ans:0, exp:"「いらいらする」＝kesal (rasa ingin marah), cocok dengan konteks gagal berulang.", id:"Padahal halnya sederhana, tapi meskipun dicoba berkali-kali tetap tidak bisa, jadi merasa kesal."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>夢中（むちゅう）</u>", opts:["⽗は最近ゴルフに夢中している","弟は買ったばかりのゲームに夢中だ","このアニメは今、⼩学⽣に夢中だ","いつか⼤きい家を建てるのが夢中だ"], ans:1, exp:"「夢中」＝terobsesi/sangat tertarik. 弟は買ったばかりのゲームに夢中だ＝adik sangat asyik dengan game barunya.", id:"Adik laki-laki saya sedang sangat asyik dengan game yang baru saja dibelinya."},
+      {
+ q:"<u>いつのまにか</u>",opts:[
+   "昨日の夜は、テレビを見ながらいつのまにか寝ていた。",
+   "彼と最後に会ったのはいつのまにか、忘れてしまった。",
+   "その展覧会が始まるのはいつのまにか、知ってますか。",
+   "ここにあったお菓子、いつのまにか全部食べたの？"
+ ],
+ ans:0,
+ exp:"「いつのまにか」＝tanpa sadar, sebelum menyadari. 正しい使い方は『昨日の夜は、テレビを見ながらいつのまにか寝ていた。』"
+}
+    ]}
+  ]
+},
+{
+  day: 2,
+  groups: [
+    { label: "問題1", items: [
+      {q:"私は⽇本の⽂化に<u>興味</u>があります。", opts:["きょみ","きょうみ","こうみ","ごうみ"], ans:1, exp:"「興味」＝きょうみ, minat.", id:"Saya tertarik pada budaya Jepang."},
+      {q:"その店は店員の<u>態度</u>が悪かったので、⼆度と⾏きたくない。", opts:["たいど","だいと","たいどう","だいとう"], ans:0, exp:"「態度」＝たいど, sikap/attitude.", id:"Karena sikap pegawai di toko itu buruk, saya tidak ingin pergi ke sana lagi."},
+      {q:"どちらのりんごがおいしいか、<u>⽐べて</u>みましょう。", opts:["たべて","くらべて","しらべて","ならべて"], ans:1, exp:"「⽐べて」＝くらべて, membandingkan.", id:"Mari kita bandingkan apel yang mana lebih enak."}
+    ]},
+    { label: "問題2", items: [
+      {q:"よく弟を泣かせて⺟に<u>おこられた</u>。", opts:["忘られた","恐られた","怒られた","努られた"], ans:2, exp:"「おこられた・怒られた」＝dimarahi.", id:"Saya sering membuat adik laki-laki menangis dan dimarahi ibu."},
+      {q:"<u>ぐあい</u>が悪いので、保健室に⾏ってもいいですか。", opts:["⾙合","⾙会","具合","具会"], ans:2, exp:"「具合」＝ぐあい, kondisi (kesehatan, situasi).", id:"Karena badan saya tidak enak, bolehkah saya pergi ke ruang kesehatan?"},
+      {q:"今⽇は朝早く起きたので、とても<u>ねむい</u>。", opts:["寝い","願い","眼い","眠い"], ans:3, exp:"「眠い」＝ねむい, mengantuk.", id:"Hari ini saya bangun pagi sekali, jadi sangat mengantuk."}
+    ]},
+    { label: "問題3", items: [
+      {q:"<u>たまに</u>家族で外⾷をします。", opts:["いつも","かならず","たいてい","ときどき"], ans:3, exp:"「たまに」≈「ときどき」, sesekali.", id:"Kadang-kadang saya makan di luar bersama keluarga."},
+      {q:"⾯接の時に、「あなたの<u>短所</u>は?」と聞かれた。", opts:["趣味","悪いところ","住んでいるところ","病気について"], ans:1, exp:"「短所」＝kekurangan ≈「悪いところ」.", id:"Saat wawancara, saya ditanya, 'Apa kekurangan Anda?'"},
+      {q:"社⻑から、何か<u>重要</u>なお知らせがあるそうだ。", opts:["新しい","⼤切な","必要な","めずらしい"], ans:1, exp:"「重要」＝penting ≈「⼤切な」.", id:"Katanya ada pengumuman penting dari direktur."},
+      {q:"やっと<u>⼿に⼊れる</u>ことができた。", opts:["借りる","さわる","⾒つける","⾃分のものにする"], ans:3, exp:"「⼿に⼊れる」＝memiliki, mendapatkan ≈「⾃分のものにする」.", id:"Akhirnya saya berhasil mendapatkannya."}
+    ]},
+    { label: "問題4", items: [
+      {q:"道に（　）、待ち合わせに遅れた。", opts:["困って","違って","迷って","間違えて"], ans:2, exp:"「道に迷う」＝tersesat.", id:"Saya tersesat di jalan dan terlambat ke tempat janji temu."},
+      {q:"毎⽇、⾞で会社に（　）している。", opts:["交通","通学","通勤","通⾏"], ans:2, exp:"「通勤」＝つうきん, pergi kerja.", id:"Saya berangkat kerja ke kantor dengan mobil setiap hari."},
+      {q:"⺟を空港まで（　）に⾏った。", opts:["⾒かけ","⾒送り","⾒回り","⾒直し"], ans:1, exp:"「⾒送りに⾏く」＝mengantar seseorang.", id:"Saya pergi mengantar ibu sampai ke bandara."},
+      {q:"スープに塩を（　）少し⼊れてください。", opts:["やや","たった","ほんの","ちょうど"], ans:2, exp:"「ほんの少し」＝cuma/sekadar sedikit.", id:"Tolong masukkan sedikit saja garam ke dalam sup."},
+      {q:"海外旅⾏に⾏くなんて、（　）なあ。", opts:["のぞましい","やかましい","あつかましい","うらやましい"], ans:3, exp:"「うらやましい」＝iri, kesirian.", id:"Bisa pergi ke luar negeri itu, sungguh iri ya."},
+      {q:"この⼩説は（　）が難しくて…", opts:["ページ","シリーズ","タイトル","ストーリー"], ans:3, exp:"「ストーリーが難しい」＝jalan cerita sulit dimengerti.", id:"Cerita novel ini sulit untuk dipahami…."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>はじめ</u>", opts:[
+"スキーをするのは、これがはじめです。",
+"私は毎朝、夫よりはじめに起きます。",
+"先生が来なくて、授業のはじめが5分遅れた。",
+"日本の生活に、はじめはなかなか慣れませんでした。"
+], ans:2, exp:"「はじめ」＝pengalaman pertama. はじめはなかなか慣れませんでした＝pada awalnya, cukup sulit menyesuaikan diri.", id:"Pada awalnya, saya cukup sulit menyesuaikan diri."},
+      {q:"<u>直前 (ちょくぜん)　</u>", opts:[
+"もう直前に終わりますから、あと少し待ってください。",
+"私の家は直前に公園があるので、子どもの声がうるさい。",
+"出発の直前になって、パスポートがないことに気づいた。",
+"まだ時間があるから、映画の直前にゆっくり買い物をしよう。"
+], ans:2, exp:"「直前」＝sesaat sebelum. 出発の直前になって気づいた＝baru sadar sesaat sebelum berangkat.", id:"Saya baru sadar sesaat sebelum berangkat."}
+    ]}
+  ]
+},
+{
+  day: 3,
+  groups: [
+    { label: "問題1", items: [
+      {q:"⼩川さんが<u>戻って</u>きたら、知らせてください。", opts:["おくって","かえって","もどって","よって"], ans:2, exp:"「戻って」＝もどって, kembali.", id:"Kalau Ogawa-san sudah kembali, tolong beri tahu saya."},
+      {q:"今⽇の<u>昼⾷</u>は何ですか。", opts:["しゅうしょく","しょうしょく","ちゅうしょく","ちょうしょく"], ans:2, exp:"「昼⾷」＝ちゅうしょく, makan siang.", id:"Makan siang hari ini apa?"},
+      {q:"レストランでコーヒーを<u>注⽂</u>した。", opts:["じゅもん","じゅうもん","ちゅもん","ちゅうもん"], ans:3, exp:"「注⽂」＝ちゅうもん, pesan.", id:"Saya memesan kopi di restoran."}
+    ]},
+    { label: "問題2", items: [
+      {q:"この近くで⼤きな<u>じけん</u>が起きたそうだ。", opts:["事件","事故","実験","実現"], ans:0, exp:"「じけん・事件」＝peristiwa, kasus.", id:"Katanya telah terjadi peristiwa besar di dekat sini."},
+      {q:"<u>そつぎょう</u>の記念に、みんなで写真をとった。", opts:["卒⾏","卒業","率⾏","率業"], ans:1, exp:"「卒業」(そつぎょう)＝kelulusan.", id:"Untuk mengenang kelulusan, kami semua berfoto bersama."},
+      {q:"使い⽅が<u>ふくざつ</u>なものは買いたくない。", opts:["復誰","復雜","複誰","複雑"], ans:3, exp:"「複雑」＝rumit/kompleks.", id:"Saya tidak ingin membeli barang yang cara pemakaiannya rumit."}
+    ]},
+    { label: "問題3", items: [
+      {q:"試験の結果がわかるので、とても<u>緊張している</u>。", opts:["あせって","ふるえて","どきどきして","わくわくして"], ans:2, exp:"「緊張している」＝「どきどきして」, tegang/gugup.", id:"Karena hasil ujian akan diketahui, saya sangat gugup."},
+      {q:"このマラソン⼤会は誰でも<u>参加</u>できます。", opts:["⼊場","出場","会場","登場"], ans:1, exp:"「参加」≈「出場」, ikut serta lomba.", id:"Lomba maraton ini bisa diikuti oleh siapa saja."},
+      {q:"息⼦の声を電話で聞いて、<u>ほっとした</u>。", opts:["安⼼した","うれしかった","おどろいた","なつかしかった"], ans:0, exp:"「ほっとした」＝lega ≈「安⼼した」.", id:"Saya merasa lega setelah mendengar suara anak saya lewat telepon."},
+      {q:"A:最近どうですか。B: <u>相変わらず</u>です。", opts:["元気","調⼦が悪い","以前と同じ","変化があった"], ans:2, exp:"「相変わらず」＝seperti biasa, tidak berubah ≈「以前と同じ」.", id:"A: Bagaimana kabar akhir-akhir ini? B: Seperti biasa saja."}
+    ]},
+    { label: "問題4", items: [
+      {q:"インターネットの（　）で、世界は⼤きく変わった。", opts:["発⾏","発表","発進","発達"], ans:3, exp:"「発達」＝perkembangan.", id:"Karena perkembangan internet, dunia telah banyak berubah."},
+      {q:"今まで⾒た中で（　）の映画です。", opts:["最⼤","最⾼","絶⼤","絶好"], ans:1, exp:"「最⾼の映画」＝film terbaik.", id:"Ini adalah film terbaik yang pernah saya tonton sejauh ini."},
+      {q:"私の部屋は南（　）で、⽇当たりがいい。", opts:["沿い","向き","芳","上"], ans:1, exp:"「南向き」＝menghadap selatan.", id:"Kamar saya menghadap ke selatan, jadi pencahayaannya bagus."},
+      {q:"このドラマはとても（　）な話で、⼥性に⼈気がある。", opts:["ロマン","ロマンス","ロマンチスト","ロマンチック"], ans:3, exp:"「ロマンチックな話」＝cerita romantis.", id:"Drama ini sangat romantis dan populer di kalangan wanita."},
+      {q:"あせ（汗）を（　）ので、シャワーを浴びた。", opts:["した","でた","かいた","きいた"], ans:2, exp:"「汗をかいた」＝berkeringat.", id:"Karena berkeringat, saya mandi shower."},
+      {q:"（　）さいふを忘れてしまった。", opts:["うっかり","がっかり","さっぱり","はっきり"], ans:0, exp:"「うっかり」＝tidak sengaja.", id:"Saya tanpa sengaja lupa membawa dompet."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>重⼤</u>", opts:["私にとって家族は何より重⼤だ","荷物が重⼤で、⼀⼈で持てない","そのことを決めたリーダーの責任は重⼤だ","その会議には、さまざまな重⼤がある"], ans:2, exp:"「責任は重⼤」＝tanggung jawab berat.", id:"Tanggung jawab pemimpin yang memutuskan hal itu sangat besar."},
+      {q:"<u>少なくとも</u>", opts:["⼿術後、少なくとも1週間は⼊院が必要です","時間がなくて、出発前に少なくともだった","ほしいカメラを少なくとも買った","あんなにひどいことを少なくとも⾔った"], ans:0, exp:"「少なくとも」＝setidaknya. ⼿術後、少なくとも1週間は⼊院が必要です。", id:"Setelah operasi, setidaknya diperlukan rawat inap selama satu minggu."}
+    ]}
+  ]
+},
+{
+  day: 4,
+  groups: [
+    { label: "問題1", items: [
+      {q:"<u>親しい</u>友⼈に相談した。", opts:["くわしい","したしい","やさしい","あたらしい"], ans:1, exp:"「親しい」＝したしい, dekat/akrab.", id:"Saya berkonsultasi dengan teman dekat."},
+      {q:"彼⼥は本当に<u>努⼒</u>していると思う。", opts:["どりょく","のりょく","どくりょく","のうりょく"], ans:0, exp:"「努⼒」＝どりょく, usaha keras.", id:"Saya pikir dia benar-benar berusaha keras."},
+      {q:"インターネットで<u>過去</u>のニュースを調べた。", opts:["かきょ","かきょう","かこ","かこう"], ans:2, exp:"「過去」＝かこ, masa lalu.", id:"Saya mencari berita lama di internet."}
+    ]},
+    { label: "問題2", items: [
+      {q:"今週はやることが多くて、とても<u>いそがしい</u>。", opts:["忙しい","忙がしい","急しい","急がしい"], ans:0, exp:"「忙しい」＝sibuk.", id:"Minggu ini banyak hal yang harus dilakukan, jadi sangat sibuk."},
+      {q:"その⼈のことは<u>おぼえて</u>いますが、名前が思い出せません。", opts:["党えて","営えて","覚えて","賞えて"], ans:2, exp:"「覚える」＝ingat.", id:"Saya ingat orangnya, tetapi tidak bisa mengingat namanya."},
+      {q:"⼀度の<u>しっぱい</u>であきらめてはいけない。", opts:["⽮財","⽮敗","失財","失敗"], ans:3, exp:"「失敗」＝gagal.", id:"Tidak boleh menyerah hanya karena satu kali gagal."}
+    ]},
+    { label: "問題3", items: [
+      {q:"⾶⾏機の到着まで<u>約</u>5時間です。", opts:["あと","ほんの","だいたい","ちょうど"], ans:2, exp:"「約」＝やく, kira-kira ≈「だいたい」.", id:"Sekitar 5 jam lagi sampai pesawat tiba."},
+      {q:"写真を<u>ご覧ください</u>。", opts:["⾒てください","出してください","とってください","⾒せてください"], ans:0, exp:"「ご覧ください」＝敬語 untuk「⾒てください」.", id:"Silakan lihat foto ini."},
+      {q:"この島は⾃然が多くて<u>うつくしい</u>。", opts:["有名だ","きれいだ","きびしい","めずらしい"], ans:1, exp:"「美しい」＝うつくしい ≈「きれいだ」.", id:"Pulau ini kaya akan alam dan indah."},
+      {q:"この⽊は<u>あっというま</u>に⼤きくなった。", opts:["だんだん","ゆっくり","⼀番早く","短い時間で"], ans:3, exp:"「あっというま」＝dalam waktu singkat.", id:"Pohon ini tumbuh besar dengan sangat cepat."}
+    ]},
+    { label: "問題4", items: [
+      {q:"優勝するのは彼だろうと思っていたら、（　）そうだった。", opts:["しかも","なぜか","なぜなら","やはり"], ans:3, exp:"「やはり」＝memang (hasil sesuai dugaan).", id:"Saya pikir dialah yang akan menjadi juara, dan ternyata benar."},
+      {q:"家を建てるために、（　）を買った。", opts:["地上","地⽅","⼟地","場所"], ans:2, exp:"「⼟地」＝とち, tanah.", id:"Saya membeli tanah untuk membangun rumah."},
+      {q:"この靴は歩きやすいので、とても（　）いる。", opts:["気にして","気にいって","気にかかって","気にさわって"], ans:1, exp:"「気に⼊っている」＝menyukai.", id:"Sepatu ini nyaman dipakai berjalan, jadi saya sangat menyukainya."},
+      {q:"電⾞が（　）いて、乗れなかった。", opts:["こんで","つんで","あまって","たまって"], ans:0, exp:"「混んでいる」＝penuh/sesak.", id:"Kereta sangat penuh, jadi saya tidak bisa naik."},
+      {q:"太陽の光を利⽤した（　）の開発が進められている。", opts:["パワー","ビタミン","カロリー","エネルギー"], ans:3, exp:"「エネルギー」＝energi; konteks tenaga surya.", id:"Pengembangan energi yang memanfaatkan cahaya matahari sedang dikembangkan."},
+      {q:"そのかばん、今度の旅⾏に（　）ですね。", opts:["がっかり","すっかり","たっぷり","ぴったり"], ans:3, exp:"「ぴったり」＝pas, cocok.", id:"Tas itu pas sekali untuk perjalanan kali ini."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>似合う</u>", opts:["このワインは、料理によく似合う","あの親⼦は顔がよく似合っている","その黒い帽⼦は、彼によく似合っていた","最近のドラマは、どれも似合う"], ans:2, exp:"「似合う」＝cocok, digunakan untuk penampilan/pakaian/aksesori. その黒い帽⼦は、彼によく似合っていた。", id:"Topi hitam itu sangat cocok untuknya."},
+      {q:"<u>実に</u>", opts:["この作品は、実にすばらしい","実に話してあやまった","実にやってみたら、思った通りだった","まだ誰にも実に話していない"], ans:0, exp:"「実に」＝sungguh/benar-benar, cocok dengan ekspresi pujian. この作品は、実にすばらしい。", id:"Karya ini benar-benar luar biasa."}
+    ]}
+  ]
+},
+{
+  day: 5,
+  groups: [
+    { label: "問題1", items: [
+      {q:"家族の中で、妹が⼀番よくペットの<u>世話</u>をしている。", opts:["せわ","よわ","せいわ","ぜいわ"], ans:0, exp:"「世話」＝せわ, merawat, mengurus.", id:"Di dalam keluarga, adik perempuan paling sering merawat hewan peliharaan."},
+      {q:"結婚式で、友⼈を<u>代表</u>してスピーチをした。", opts:["たいひょう","たいぴょう","だいひょう","だいぴょう"], ans:2, exp:"「代表」＝だいひょう, perwakilan.", id:"Di pesta pernikahan, saya memberi pidato mewakili teman-teman."},
+      {q:"観客たちは、彼を⼤きな拍⼿で<u>迎えた</u>。", opts:["かかえた","ささえた","とらえた","むかえた"], ans:3, exp:"「迎える」＝むかえる, menyambut.", id:"Para penonton menyambutnya dengan tepuk tangan yang meriah."}
+    ]},
+    { label: "問題2", items: [
+      {q:"毎⽇、暑い⽇が<u>つづいて</u>いる。", opts:["続いて","経いて","結いて","継いて"], ans:0, exp:"「続いて」＝つづいて, berkelanjutan.", id:"Setiap hari, cuaca panas terus berlanjut."},
+      {q:"このような事故が何度も起きて、本当に<u>ざんねん</u>だ。", opts:["浅念","浅然","残念","残然"], ans:2, exp:"「残念」＝ざんねん, sayang sekali.", id:"Kecelakaan seperti ini terjadi berulang kali, sungguh disayangkan."},
+      {q:"そこの<u>まど</u>を開けてもいいですか。", opts:["空","突","究","窓"], ans:3, exp:"「窓」＝まど, jendela.", id:"Bolehkah saya membuka jendela di sana?"}
+    ]},
+    { label: "問題3", items: [
+      {q:"そのとき私が⾒たことを、<u>すべて</u>話します。", opts:["まったく","ぜんぜん","全体","全部"], ans:3, exp:"「全部」＝semuanya (dalam konteks benda/kisah).", id:"Saya akan menceritakan semua yang saya lihat saat itu."},
+      {q:"テレビを⾒ている間、姉はずっと<u>だまって</u>いた。", opts:["動いていた","⽌まっていた","笑っていた","話さなかった"], ans:3, exp:"「だまる」＝diam ≈「話さなかった」.", id:"Selama menonton TV, kakak perempuan terus diam."},
+      {q:"最近、彼⼥の様⼦が<u>おかしい</u>。", opts:["変だ","静かだ","まじめだ","おもしろい"], ans:0, exp:"「おかしい」＝aneh, ganjil ≈「変だ」.", id:"Akhir-akhir ini, sikap/keadaan dia aneh."},
+      {q:"疲れていると、いい<u>アイディア</u>が浮かばない。", opts:["話","考え","⾔葉","感想"], ans:1, exp:"「アイディア」＝gagasan/pemikiran ≈「考え」.", id:"Kalau sedang lelah, ide yang bagus tidak muncul."}
+    ]},
+    { label: "問題4", items: [
+      {q:"茶⽥さんなら、もう（　）前に帰りましたよ。", opts:["だいぶ","たぶん","だいたい","たしかに"], ans:0, exp:"「だいぶ前に」＝sudah cukup lama.", id:"Kalau Chada-san, dia sudah pulang sejak cukup lama yang lalu."},
+      {q:"私の（　）の夢は、⾃分の会社をつくることです。", opts:["先⽇","以降","未来","将来"], ans:3, exp:"「将来」＝masa depan (pribadi).", id:"Mimpi masa depan saya adalah mendirikan perusahaan sendiri."},
+      {q:"世界の⼈⼝はどんどん（　）している。", opts:["尖","増加","蔵","箱量"], ans:1, exp:"「増加」＝ぞうか, bertambah/peningkatan.", id:"Jumlah penduduk dunia terus meningkat dengan pesat."},
+      {q:"クラスで好きな本の（　）をとったら、⼀位はマンガだった。", opts:["コメント","アンケート","インタビュー","メッセージ"], ans:1, exp:"「アンケート」＝jajak pendapat/survei.", id:"Ketika kami mengadakan angket buku favorit di kelas, peringkat pertama adalah manga."},
+      {q:"昨⽇は夜遅くまで起きていたので、眠くて（　）が出る。", opts:["せき","あくび","ため息","くしゃみ"], ans:1, exp:"「あくび」＝menguap.", id:"Kemarin saya begadang sampai larut malam, jadi mengantuk dan menguap."},
+      {q:"今⽇はたくさん遊んだので、⼦どもたちは（　）寝ている。", opts:["ぐっすり","すっきり","はっきり","ゆっくり"], ans:0, exp:"「ぐっすり」＝tidur nyenyak.", id:"Karena hari ini banyak bermain, anak-anak tidur nyenyak."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>修理</u>", opts:["テレビの画⾯の明るさを修理した","この計画はまだまだ修理が必要だ","こわれた⾃転⾞を⾃分で修理した","間違えたところを修理した"], ans:2, exp:"「修理」＝memperbaiki barang fisik. こわれた⾃転⾞を⾃分で修理した。", id:"Saya memperbaiki sepeda yang rusak sendiri."},
+      {q:"<u>どうしても</u>", opts:["どうしてもお体には気をつけてください","すみません、明⽇の午後はどうしても⾏けないんです","何度やっても失敗ばかりだ","地図を忘れたのでどうしても⼼配だ"], ans:1, exp:"「どうしても〜できない」＝bagaimanapun juga tidak bisa. すみません、明⽇の午後はどうしても⾏けないんです。", id:"Maaf, besok sore saya benar-benar tidak bisa pergi."}
+    ]}
+  ]
+},
+{
+  day: 6,
+  groups: [
+    { label: "問題1", items: [
+      {q:"この果物は<u>苦い</u>から⾷べたくない。", opts:["あまい","にがい","まずい","わかい"], ans:1, exp:"「苦い」＝にがい, pahit.", id:"Buah ini pahit, jadi saya tidak ingin memakannya."},
+      {q:"眠かったので、先⽣の話の<u>内容</u>はぜんぜん覚えていない。", opts:["ないよ","ないよう","ねいよ","ねいよう"], ans:1, exp:"「内容」＝ないよう, isi/konten.", id:"Karena mengantuk, saya sama sekali tidak ingat isi penjelasan guru."},
+      {q:"A国の⾸相がB国を<u>訪れた</u>。", opts:["かたれた","たずれた","ほうれた","おとずれた"], ans:3, exp:"「訪れる」＝おとずれる, mengunjungi (kunjungan resmi).", id:"Perdana Menteri negara A mengunjungi negara B."}
+    ]},
+    { label: "問題2", items: [
+      {q:"会員の<u>もうしこみ</u>はどこでできますか。", opts:["甲し込み","甲し混み","申し込み","申し混み"], ans:2, exp:"「申し込み」＝もうしこみ, pendaftaran.", id:"Di mana saya bisa mendaftar sebagai anggota?"},
+      {q:"10キロも歩いたので、⾜が<u>いたい</u>。", opts:["症い","病い","疲い","痛い"], ans:3, exp:"「痛い」＝いたい, sakit.", id:"Karena berjalan sampai 10 km, kaki saya sakit."},
+      {q:"今回の試験は、前よりも<u>かんたん</u>だった。", opts:["関単","問単","間単","簡単"], ans:3, exp:"「簡単」＝かんたん, mudah.", id:"Ujian kali ini lebih mudah dibanding sebelumnya."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この部屋は他の部屋に⽐べて、<u>やや</u>広い。", opts:["すこし","だいぶ","もっと","けっこう"], ans:0, exp:"「やや」＝sedikit ≈「すこし」.", id:"Kamar ini agak lebih luas dibanding kamar yang lain."},
+      {q:"これは<u>めずらしい</u>お酒ですから、ぜひ飲んでみてください。", opts:["有名な","おいしい","値段が⾼い","あまりない"], ans:3, exp:"「めずらしい」＝langka, tidak umum ≈「あまりない」.", id:"Ini adalah minuman keras yang langka, jadi silakan coba diminum."},
+      {q:"<u>先⽇</u>、初めて⽇本のお寺に⾏きました。", opts:["きのう","おととい","あのとき","このあいだ"], ans:3, exp:"「先⽇」＝belum lama ini ≈「このあいだ」.", id:"Beberapa hari lalu, saya pergi ke kuil Buddha di Jepang untuk pertama kalinya."},
+      {q:"このクラスは<u>おしゃべり</u>な⼈が多い。", opts:["よく話す","よく休む","よく笑う","よく勉強する"], ans:0, exp:"「おしゃべり」＝suka bicara ≈「よく話す」.", id:"Di kelas ini banyak orang yang cerewet/suka mengobrol."}
+    ]},
+    { label: "問題4", items: [
+      {q:"家の隣でマンションが（　）されているので、毎⽇うるさい。", opts:["建設","歳","設計","準備"], ans:0, exp:"「建設」＝pembangunan.", id:"Karena sedang dibangun apartemen di sebelah rumah, setiap hari berisik."},
+      {q:"使い終わったパソコンの電源を（　）。", opts:["きった","しめた","とめた","やめた"], ans:0, exp:"「電源を切る」＝mematikan perangkat.", id:"Matikan daya komputer setelah selesai digunakan."},
+      {q:"このプールは（　）から、⼦どもでも安全だ。", opts:["あさい","ひくい","ほそい","みじかい"], ans:0, exp:"「浅い」＝あさい, dangkal.", id:"Kolam ini dangkal, jadi aman bahkan untuk anak-anak."},
+      {q:"彼はまじめに働かなかったので、会社を（　）になった。", opts:["⾜","指","⾸","頭"], ans:2, exp:"「⾸になる」＝クビになる, dipecat dari pekerjaan.", id:"Karena dia tidak bekerja dengan sungguh-sungguh, dia dipecat dari perusahaan."},
+      {q:"よく聞こえないので、もっと（　）話してください。", opts:["ぐっすり","すっきり","はっきり","めっきり"], ans:2, exp:"「はっきり」＝dengan jelas.", id:"Suaranya tidak terdengar jelas, jadi tolong bicara lebih jelas."},
+      {q:"A:この映画、どうだった? B:（　）おもしろかったよ。", opts:["さっぱり","たいてい","まあまあ","まったく"], ans:2, exp:"「まあまあ」＝lumayan.", id:"A: Bagaimana film ini? B: Lumayan menarik."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>正直</u>", opts:["もっと正直な発⾳で話してください","誰がコップを割ったのか、正直に⾔いなさい","コピーではなく、正直な⽅法で","エアコンの修理が終わって正直だ"], ans:1, exp:"「正直に⾔いなさい」＝jujurlah. 誰がコップを割ったのか、正直に⾔いなさい。", id:"Katakan dengan jujur siapa yang memecahkan gelas itu."},
+      {q:"<u>わざわざ</u>", opts:["兄は答えを知っているがわざわざだ","ですが、⽤事がわざわざあります","遠いところですが、わざわざ来ました","忙しいのに、わざわざ家まで迎えに来てくれてありがとう"], ans:3, exp:"「わざわざ」＝melakukan sesuatu dengan usaha khusus. 忙しいのに、わざわざ家まで迎えに来てくれてありがとう。", id:"Terima kasih sudah repot-repot datang menjemput ke rumah padahal sedang sibuk."}
+    ]}
+  ]
+},
+{
+  day: 7,
+  groups: [
+    { label: "問題1", items: [
+      {q:"今年の<u>流⾏</u>の⾊は⾚だそうだ。", opts:["りゅうこ","りゅこう","りゅうこう","りゅうごう"], ans:2, exp:"「流⾏」＝りゅうこう, tren, populer.", id:"Katanya warna yang sedang tren tahun ini adalah merah."},
+      {q:"⽇本に留学した<u>⽬的</u>は何ですか。", opts:["もくてき","もくでき","もってき","もっでき"], ans:0, exp:"「⽬的」＝もくてき, tujuan.", id:"Apa tujuan Anda belajar di Jepang?"},
+      {q:"テニスのしすぎで、<u>腕</u>が痛くなった。", opts:["うで","かた","こし","むね"], ans:0, exp:"「腕」＝うで, lengan.", id:"Karena terlalu banyak bermain tenis, lengan saya menjadi sakit."}
+    ]},
+    { label: "問題2", items: [
+      {q:"恥ずかしくて<u>かお</u>が⾚くなった。", opts:["頭","顏","額","題"], ans:1, exp:"「顔」＝かお, wajah/muka.", id:"Karena malu, wajah saya menjadi merah."},
+      {q:"漢字をたくさん覚えられる<u>ほうほう</u>が知りたい。", opts:["⽅法","法⽅","放法","法放"], ans:0, exp:"「⽅法」＝ほうほう, cara/metode.", id:"Saya ingin tahu cara agar bisa menghafal banyak kanji."},
+      {q:"最近、親との<u>かんけい</u>があまりよくない。", opts:["関系","関係","間系","問係"], ans:1, exp:"「関係」＝かんけい, hubungan.", id:"Akhir-akhir ini hubungan saya dengan orang tua kurang baik."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この本は<u>ただ</u>です。ご⾃由にどうぞ。", opts:["無事","無理","無料","無駄"], ans:2, exp:"「無料」＝gratis.", id:"Buku ini gratis. Silakan ambil sesuka Anda."},
+      {q:"昔は仕事を⾃分で<u>選択</u>することができなかった。", opts:["えらぶ","さがす","やめる","はじめる"], ans:0, exp:"「選択」＝memilih ≈「選ぶ」.", id:"Dulu tidak bisa memilih pekerjaan sendiri."},
+      {q:"「ああ、<u>くたびれた</u>」と⾔って、⽗はいすに座った。", opts:["疲れた","残念だ","忙しい","具合が悪い"], ans:0, exp:"「くたびれた」＝lelah/capek.", id:"Sambil berkata 'Ah, capek sekali', ayah duduk di kursi."},
+      {q:"⾞を運転するときは、⼗分<u>気をつけて</u>ください。", opts:["決⼼して","⼼配して","注意して","注⽬して"], ans:2, exp:"「気をつける」≈「注意して」, berhati-hati.", id:"Saat mengemudi mobil, harap berhati-hati dengan baik."}
+    ]},
+    { label: "問題4", items: [
+      {q:"警察はその事件の（　）を集めている。", opts:["伝⾔","伝達","情報","情熱"], ans:2, exp:"「情報」＝informasi.", id:"Polisi sedang mengumpulkan informasi tentang kejadian tersebut."},
+      {q:"どんなスポーツでも、（　）するには毎⽇練習するしかない。", opts:["上達","進化","進⾏","発達"], ans:0, exp:"「上達」＝じょうたつ, berkembang menjadi lebih baik.", id:"Dalam olahraga apa pun, untuk menjadi mahir tidak ada cara lain selain berlatih setiap hari."},
+      {q:"窓を開けると、（　）⾵が⼊ってきた。", opts:["うつくしい","なつかしい","さわやかな","しょうじきな"], ans:2, exp:"「さわやかな」＝segar/sejuk.", id:"Saat jendela dibuka, angin segar masuk."},
+      {q:"約束の時間を（　）、彼は来なかった。", opts:["進んでも","過ぎても","伸びても","終わっても"], ans:1, exp:"「時間を過ぎても」＝meskipun lewat waktunya.", id:"Meskipun waktu janji sudah lewat, dia tidak datang."},
+      {q:"この店の料理はおいしいので、（　）⾷べすぎてしまう。", opts:["ぜひ","つい","まず","もう"], ans:1, exp:"「つい」＝tanpa sadar/tak sengaja.", id:"Masakan di restoran ini enak, jadi tanpa sadar makan terlalu banyak."},
+      {q:"朝から何も⾷べていないので、おなかが（　）です。", opts:["からから","ぐうぐう","でこぼこ","ぺこぺこ"], ans:3, exp:"「ぺこぺこ」＝sangat lapar.", id:"Karena belum makan apa pun sejak pagi, perut saya sangat lapar."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>やっと</u>", opts:["始まる1時間前には、やっと到着した","彼⼥が来るまで5時間もやっとだった","彼に⼿紙を出したら、やっと返事が来た","この道は危ないと、やっと思った"], ans:2, exp:"「やっと」＝akhirnya (setelah menunggu lama). 彼に⼿紙を出したら、やっと返事が来た。", id:"Begitu film mulai, akhirnya saya bisa menonton dengan tenang."},
+      {q:"<u>出会う</u>", opts:["1年ぶりに、祖⽗と祖⺟に出会った","明⽇の12時に駅前で出会う","毎⽇友達に出会うのが楽しみだ","中学⽣のとき、⼭⼝先⽣に出会った"], ans:3, exp:"「出会う」＝digunakan saat pertemuan yang bermakna/berkesan. 中学⽣のとき⼭⼝先⽣に出会った。", id:"Saat SMP, saya bertemu dengan Pak/Bu Guru Yamaguchi."}
+    ]}
+  ]
+},
+{
+  day: 8,
+  groups: [
+    { label: "問題1", items: [
+      {q:"起きてすぐに<u>コップ⼀杯</u>の⽔を飲んだ。", opts:["いちはい","いちばい","いっぱい","いっばい"], ans:2, exp:"「いっぱい」＝satu gelas penuh.", id:"Begitu bangun tidur, saya langsung minum segelas air."},
+      {q:"<u>⽉末</u>までに代⾦を払ってください。", opts:["がつすえ","げつすえ","がつまつ","げつまつ"], ans:3, exp:"「⽉末」＝げつまつ, akhir bulan.", id:"Silakan bayar biayanya sebelum akhir bulan."},
+      {q:"気持ちを⾔葉で<u>表現</u>するのは難しい。", opts:["ひゅげん","ひゅうげん","ひょげん","ひょうげん"], ans:3, exp:"「表現」＝ひょうげん, ekspresi.", id:"Mengekspresikan perasaan dengan kata-kata itu sulit."},
+      {q:"このアパートの<u>やちん</u>は⽉6万円です。", opts:["家代","家賃","屋代","屋質"], ans:1, exp:"「家賃」＝やちん, biaya sewa rumah.", id:"Sewa apartemen ini adalah 60.000 yen per bulan."},
+      {q:"今の仕事は、⽇本へ⾏く<u>きかい</u>が多い。", opts:["機会","機械","期械","期会"], ans:0, exp:"「機会」＝きかい, kesempatan.", id:"Pekerjaan saya sekarang sering memberi kesempatan pergi ke Jepang."},
+      {q:"この問題は、<u>おちついて</u>よく考えれば、わかるはずです。", opts:["下ち付いて","下ち着いて","落ち付いて","落ち着いて"], ans:3, exp:"「落ち着いて」＝tenang.", id:"Masalah ini seharusnya bisa dipahami jika dipikirkan dengan tenang."}
+    ]},
+    { label: "問題3", items: [
+      {q:"<u>まもなく</u>開会式が始まります。", opts:["ついに","やっと","とうとう","もうすぐ"], ans:3, exp:"「もうすぐ」＝sebentar lagi.", id:"Sebentar lagi upacara pembukaan akan dimulai."},
+      {q:"全国から1000⼈以上の<u>応募</u>があった。", opts:["参加","返事","質問","申し込み"], ans:3, exp:"「応募」＝pendaftaran ≈「申し込み」.", id:"Ada lebih dari 1.000 pelamar dari seluruh negeri."},
+      {q:"予約をしないで⾏ったが、店は<u>すいていた</u>。", opts:["開いていた","閉まっていた","⼈が多かった","⼈が少なかった"], ans:3, exp:"「すいていた」＝tidak ramai.", id:"Saya pergi tanpa reservasi, tetapi restorannya sedang sepi."},
+      {q:"彼⼥の考え⽅はいつも<u>ユニーク</u>だ。", opts:["⼈と違う","特によい","わがままだ","間違っている"], ans:0, exp:"「ユニーク」＝unik.", id:"Cara berpikirnya selalu unik."}
+    ]},
+    { label: "問題4", items: [
+      {q:"⽗は毎朝、体重と⾎圧を測ってノートに（　）している。", opts:["記憶","記述","記念","記録"], ans:3, exp:"「記録」＝mencatat data.", id:"Ayah setiap pagi mengukur berat badan dan tekanan darah lalu mencatatnya di buku."},
+      {q:"私たち兄弟は顔は似ているが、（　）はあまり似ていない。", opts:["性格","性質","性別","性能"], ans:0, exp:"「性格」＝kepribadian.", id:"Kami bersaudara wajahnya mirip, tetapi kepribadiannya tidak begitu mirip."},
+      {q:"昨⽇のサッカーの試合の（　）を教えてください。", opts:["予想","予報","結果","結論"], ans:2, exp:"「結果」＝hasil.", id:"Tolong beri tahu hasil pertandingan sepak bola kemarin."},
+      {q:"⼆⽇前から熱があって、せきも（　）。", opts:["来る","出る","痛い","よくない"], ans:1, exp:"「せきも出る」＝batuk juga keluar.", id:"Sejak dua hari lalu saya demam dan juga batuk."},
+      {q:"明⽇は会員の（　）全員が集まる予定だ。", opts:["チーム","ナンバー","メンバー","グループ"], ans:2, exp:"「メンバー」＝anggota.", id:"Besok semua anggota perkumpulan dijadwalkan berkumpul."},
+      {q:"あの⾞はさっきから同じところを（　）回っている。", opts:["ぐるぐる","ごろごろ","ぶつぶつ","まるまる"], ans:0, exp:"「ぐるぐる」＝berputar-putar.", id:"Mobil itu sejak tadi berputar-putar di tempat yang sama."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>断る</u>", opts:["はさみで紙を断った","歌⼿になる夢を断った","飲み会のさそいを断った","ピアノの練習を断った"], ans:2, exp:"「断る」＝ことわる, menolak ajakan/permintaan. 飲み会のさそいを断った。", id:"Saya menolak ajakan minum-minum."},
+      {q:"<u>節約</u>", opts:["⾷事の量を節約していく","レストランを節約してください","エアコンを節約してください","先⽉はたくさん買い物しましたので、今⽉は節約しようと思う"], ans:3, exp:"「節約」＝せつやく, menghemat (uang/listrik). 先⽉はたくさん買い物しましたので、今⽉は節約しようと思う。", id:"Bulan lalu saya banyak berbelanja, jadi bulan ini saya berniat berhemat."}
+    ]}
+  ]
+},
+{
+  day: 9,
+  groups: [
+    { label: "問題1", items: [
+      {q:"明⽇は駅の<u>改札</u>の前で会いましょう。", opts:["かいざい","かいさつ","がいさい","がいさつ"], ans:1, exp:"「改札」＝かいさつ, gerbang tiket di stasiun.", id:"Besok mari bertemu di depan pintu tiket stasiun."},
+      {q:"事故の<u>原因</u>は、居眠り運転だったそうだ。", opts:["けいいん","げいいん","けんいん","げんいん"], ans:3, exp:"「原因」＝げんいん, penyebab.", id:"Penyebab kecelakaan itu katanya adalah mengemudi sambil mengantuk."},
+      {q:"テレビのニュース<u>番組</u>で、その事件を知った。", opts:["ばんくみ","ばんぐみ","ぱんくみ","ぱんぐみ"], ans:1, exp:"「番組」＝ばんぐみ, program (TV).", id:"Saya mengetahui kejadian itu dari acara berita di televisi."}
+    ]},
+    { label: "問題2", items: [
+      {q:"⽋席するときは、必ず学校に<u>れんらく</u>してください。", opts:["連結","連絡","練結","練絡"], ans:1, exp:"「連絡」＝れんらく, kontak/pemberitahuan.", id:"Jika tidak masuk, harap selalu menghubungi sekolah."},
+      {q:"この店の<u>しょうひん</u>は、すべて海外から輸⼊したものです。", opts:["商品","賞品","製品","制品"], ans:0, exp:"「商品」＝しょうひん, barang dagangan.", id:"Semua produk di toko ini diimpor dari luar negeri."},
+      {q:"⽇本には、3年前に<u>かんこう</u>で来たことがあります。", opts:["款⾏","歡光","银⾏","観光"], ans:3, exp:"「観光」＝かんこう, wisata.", id:"Saya pernah datang ke Jepang untuk berwisata tiga tahun yang lalu."}
+    ]},
+    { label: "問題3", items: [
+      {q:"兄は⼤学で経済を<u>まなんで</u>いる。", opts:["読んで","教えて","勉強して","説明して"], ans:2, exp:"「学ぶ」＝belajar ≈「勉強して」.", id:"Kakak saya belajar ekonomi di universitas."},
+      {q:"友達と<u>徹夜</u>でいろいろな話をした。", opts:["夜の間に","毎晩続けて","夜遅くまで","朝まで寝ないで"], ans:3, exp:"「徹夜」＝begadang (tidak tidur semalaman).", id:"Saya berbincang-bincang tentang berbagai hal dengan teman semalaman."},
+      {q:"先週やっと卒論が<u>完成</u>した。", opts:["出来た","読めた","決まった","分かった"], ans:0, exp:"「完成」＝selesai dibuat ≈「出来た」.", id:"Minggu lalu akhirnya skripsi saya selesai."},
+      {q:"気温が<u>じょじょに</u>上がってきている。", opts:["少しずつ","どんどん","ゆっくり","とても早く"], ans:0, exp:"「徐々に」＝perlahan-lahan ≈「少しずつ」.", id:"Suhu udara perlahan-lahan mulai naik."}
+    ]},
+    { label: "問題4", items: [
+      {q:"⾷事の（　）で電話がかかってきた。", opts:["中間","中⼼","途中","夢中"], ans:2, exp:"「途中」＝とちゅう, di tengah jalan.", id:"Telepon masuk saat saya sedang makan."},
+      {q:"（　）ではたくさんの⼈が電⾞を待っていた。", opts:["ゴール","チーム","プール","ホーム"], ans:3, exp:"「ホーム」＝peron (tempat menunggu kereta).", id:"Banyak orang sedang menunggu kereta di peron."},
+      {q:"⽗は（　）病気にかかって、もう半年も⼊院している。", opts:["厚い","重い","⾼い","深い"], ans:1, exp:"「重い病気」＝おもいびょうき, penyakit parah.", id:"Ayah menderita penyakit serius dan sudah dirawat di rumah sakit selama setengah tahun."},
+      {q:"どうぞ（　）店内にお⼊りください。", opts:["簡単に","絶対に","お気軽に","お⼿軽に"], ans:2, exp:"「お気軽に」＝dengan santai.", id:"Silakan masuk ke dalam toko dengan santai / tanpa sungkan."},
+      {q:"もう8時ですよ。（　）出かけないと遅れますよ。", opts:["そろそろ","だんだん","なかなか","まだまだ"], ans:0, exp:"「そろそろ」＝sebentar lagi, sudah waktunya.", id:"Sudah jam delapan. Kalau tidak segera berangkat, kita akan terlambat."},
+      {q:"弟は⺟との約束を（　）、遊びに⾏ってしまった。", opts:["すてて","くずして","たおして","やぶって"], ans:3, exp:"「約束をやぶる」＝melanggar janji.", id:"Adik melanggar janji dengan ibu dan pergi bermain."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>きつい</u>", opts:["かみ切れないほどきつい","兄はお酒がきつくて飲めない","この部屋はきつくて暑い","太ったので、このズボンはもうきつくてはけない"], ans:3, exp:"「きつい」＝sempit (pakaian). 太ったので、このズボンはもうきつくてはけない。", id:"Karena bertambah gemuk, celana ini sudah tidak muat lagi."},
+      {q:"<u>感動</u>", opts:["彼の話を聞いた⼈は、みんな感動して泣いていた","この本は感動⽂を書いている","まだ⼩さいのに家の仕事を感動した","先⽣にはいつもお世話になって感動だ"], ans:0, exp:"「感動する」＝tersentuh secara emosional. 彼の話を聞いた⼈は、みんな感動して泣いていた。", id:"Semua orang yang mendengar ceritanya terharu dan menangis."}
+    ]}
+  ]
+},
+{
+  day: 10,
+  groups: [
+    { label: "問題1", items: [
+      {q:"中学校の同窓会に<u>出席</u>した。", opts:["しゅせき","しゅうせき","しゅつせき","しゅっせき"], ans:3, exp:"「出席」＝しゅっせき, hadir.", id:"Saya menghadiri acara reuni teman-teman SMP."},
+      {q:"さっきまで晴れていたのに、<u>突然</u>⾬が降りだした。", opts:["ぐうぜん","こつぜん","とうぜん","とつぜん"], ans:3, exp:"「突然」＝とつぜん, tiba-tiba.", id:"Tadi masih cerah, tetapi tiba-tiba hujan mulai turun."},
+      {q:"すみませんが、伊藤さんに<u>伝⾔</u>をお願いできますか。", opts:["てんげん","てんごん","でんげん","でんごん"], ans:3, exp:"「伝⾔」＝でんごん, pesan.", id:"Permisi, bisakah Anda menyampaikan pesan kepada Pak/Bu Ito?"}
+    ]},
+    { label: "問題2", items: [
+      {q:"健康のため、毎⽇<u>うんどう</u>するようにしている。", opts:["連動","連働","運動","運働"], ans:2, exp:"「運動」＝うんどう, olahraga.", id:"Demi kesehatan, saya berusaha berolahraga setiap hari."},
+      {q:"このお茶はとても<u>あつくて</u>飲めない。", opts:["厚くて","暑くて","熱くて","温くて"], ans:2, exp:"「熱くて」＝あつくて, panas (untuk benda panas seperti minuman).", id:"Teh ini sangat panas sehingga tidak bisa diminum."},
+      {q:"⽕が消えたかどうか、<u>かくにん</u>してから部屋を出てください。", opts:["格任","格認","確任","確認"], ans:3, exp:"「確認」＝かくにん, memastikan.", id:"Pastikan apinya sudah padam sebelum meninggalkan ruangan."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この町は、10年前と⽐べて<u>すっかり</u>変わってしまった。", opts:["すこし","すべて","だいぶ","けっこう"], ans:1, exp:"「すっかり」≈「すべて」, semuanya.", id:"Kota ini sudah berubah total dibandingkan sepuluh tahun yang lalu."},
+      {q:"私はクラシック⾳楽に<u>関⼼</u>があります。", opts:["関係","興味","⾃信","知識"], ans:1, exp:"「関⼼」≈「興味」, ketertarikan.", id:"Saya tertarik pada musik klasik."},
+      {q:"こんな<u>チャンス</u>はもう⼆度とないだろう。", opts:["機会","幸福","物語","事件"], ans:0, exp:"「チャンス」＝kesempatan ≈「機会」.", id:"Kesempatan seperti ini mungkin tidak akan datang lagi."},
+      {q:"これからの予定が<u>多少</u>変わりそうです。", opts:["すこしい","とても","たぶん","もしかしたら"], ans:0, exp:"「多少」＝たしょう, sedikit.", id:"Rencana ke depannya sepertinya akan sedikit berubah."}
+    ]},
+    { label: "問題4", items: [
+      {q:"試合は時間を（　）して⾏われた。", opts:["延⻑","延期","期待","連筵"], ans:0, exp:"「延⻑」＝perpanjangan waktu.", id:"Pertandingan dilaksanakan dengan perpanjangan waktu."},
+      {q:"30年後、⾃分が何をしているのか（　）できない。", opts:["感想","想像","理想","発想"], ans:1, exp:"「想像」＝そうぞう, membayangkan.", id:"Saya tidak bisa membayangkan apa yang akan saya lakukan 30 tahun lagi."},
+      {q:"この薬は頭痛によく（　）。", opts:["あう","きく","する","できる"], ans:1, exp:"「薬がきく」＝obat manjur.", id:"Obat ini manjur untuk sakit kepala."},
+      {q:"あの⼆⼈は3年（　）から、結婚したそうだ。", opts:["似合って","出会って","知り合って","付き合って"], ans:3, exp:"「付き合って」＝berpacaran.", id:"Katanya mereka berdua menikah setelah berpacaran selama tiga tahun."},
+      {q:"あの⼈は⼝が（　）から、何でもみんなに話してしまう。", opts:["軽い","安い","短い","はやい"], ans:0, exp:"「⼝が軽い」＝tidak bisa menyimpan rahasia.", id:"Orang itu tidak bisa menyimpan rahasia, jadi semuanya diceritakan ke orang lain."},
+      {q:"（　）しながら、彼にもらったプレゼントを開けた。", opts:["そろそろ","そわそわ","わいわい","わくわく"], ans:3, exp:"「わくわく」＝bersemangat/gembira menunggu sesuatu.", id:"Dengan penuh rasa tidak sabar dan gembira, saya membuka hadiah dari dia."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>今にも</u>", opts:["今にもシャワーを浴びる","その⼥の⼈は今にも泣きだしそうだった","⼤事な話があるので、今にも来てください","そのときのことは、今にもわかる"], ans:1, exp:"「今にも」＝sebentar lagi (akan terjadi sesuatu). その⼥の⼈は今にも泣きだしそうだった。", id:"Perempuan itu tampak seperti akan menangis kapan saja."},
+      {q:"<u>ストレス</u>", opts:["⾯接のときは、かなりストレスだ","⼦どもの帰宅が遅くてストレスがある","最近、会社の⼈間関係にストレスを感じている","親しい⼈が突然亡くなってストレスだ"], ans:2, exp:"「ストレスを感じる」＝merasakan stres. 最近、会社の⼈間関係にストレスを感じている。", id:"Akhir-akhir ini saya merasa stres dengan hubungan antarorang di tempat kerja."}
+    ]}
+  ]
+}
+];
+
+// ===== KADAI DATA (final, underlined) =====
+const KADAI_PART2 = [
+{
+  day: 11,
+  groups: [
+    { label: "問題1", items: [
+      {q:"こちらにいらっしゃる<u>際</u>には、ご連絡ください。", opts:["おり","ころ","さい","とき"], ans:2, exp:"「際」＝さい, saat/ketika.", id:"Jika Anda datang ke sini, mohon hubungi kami."},
+      {q:"今⽇は<u>残業</u>をしないで早く帰りたい。", opts:["ざんきゅう","ざんきょう","ざんぎゅう","ざんぎょう"], ans:3, exp:"「残業」＝ざんぎょう, lembur.", id:"Hari ini saya ingin pulang cepat tanpa lembur."},
+      {q:"留学している娘から⼿紙が<u>届いた</u>。", opts:["きいた","ついた","とどいた","いただいた"], ans:2, exp:"「届いた」＝とどいた, sampai/dikirimkan.", id:"Surat dari putri saya yang sedang belajar di luar negeri telah sampai."}
+    ]},
+    { label: "問題2", items: [
+      {q:"道でお⾦を<u>ひろった</u>。", opts:["払った","拾った","捨った","拡った"], ans:1, exp:"「拾った」＝ひろった, memungut.", id:"Saya memungut uang di jalan."},
+      {q:"友達に家族を<u>しょうかい</u>した。", opts:["招介","招会","紹介","紹会"], ans:2, exp:"「紹介」＝しょうかい, memperkenalkan.", id:"Saya memperkenalkan keluarga saya kepada teman."},
+      {q:"話すときは、<u>あいて</u>の⽬を⾒ましょう。", opts:["合⼿","会⼿","相⼿","対⼿"], ans:2, exp:"「相⼿」＝あいて, lawan bicara.", id:"Saat berbicara, mari melihat mata lawan bicara."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この県には⼤きな<u>企業</u>が少ない。", opts:["会社","⼯場","仕事","建物"], ans:0, exp:"「企業」＝perusahaan ≈「会社」.", id:"Di prefektur ini hanya sedikit perusahaan besar."},
+      {q:"この授業はいつも<u>たいくつ</u>だ。", opts:["おもしろい","つまらない","難しい","緊張する"], ans:1, exp:"「退屈」＝たいくつ, membosankan.", id:"Pelajaran ini selalu membosankan."},
+      {q:"プールは<u>ルール</u>を守って利⽤して。", opts:["規則","順番","場所","服装"], ans:0, exp:"「ルール」≈「規則」, peraturan.", id:"Gunakan kolam renang dengan mematuhi peraturan."},
+      {q:"そんなことは<u>常識</u>だよ。", opts:["よくあること","いつもと同じこと","前から知っていること","誰でも知っていること"], ans:3, exp:"「常識」＝じょうしき, hal yang diketahui semua orang.", id:"Hal seperti itu sudah merupakan hal yang umum."}
+    ]},
+    { label: "問題4", items: [
+      {q:"明⽇の12時に映画館の前で（　）ましょう。", opts:["出会い","知り合い","待ち合い","待ち合わせ"], ans:3, exp:"「待ち合わせ」＝janjian bertemu.", id:"Besok jam 12 mari bertemu di depan bioskop."},
+      {q:"早く宿題を（　）遊びに⾏きたい。", opts:["すませて","なくして","のこして","かたづいて"], ans:0, exp:"「済ませて」＝終わらせる, menyelesaikan.", id:"Saya ingin segera menyelesaikan PR lalu pergi bermain."},
+      {q:"禁煙するためにいろいろな⽅法を試したが、あまり（　）がなかった。", opts:["結果","効果","完了","完成"], ans:1, exp:"「効果」＝こうか, efek/manfaat.", id:"Saya mencoba berbagai cara untuk berhenti merokok, tetapi hasilnya tidak terlalu efektif."},
+      {q:"新聞の記事は、つねに（　）であるべきだ。", opts:["正確","正直","真剣","真⾯⽬"], ans:0, exp:"「正確」＝せいかく, akurat/tepat.", id:"Artikel surat kabar seharusnya selalu akurat."},
+      {q:"この電話は、お年寄り（　）にボタンが⼤きく作られている。", opts:["⾏き","かけ","付き","向け"], ans:3, exp:"「向け」＝〜のために, ditujukan bagi.", id:"Telepon ini dibuat dengan tombol besar untuk orang lanjut usia."},
+      {q:"こちらにお受け取りの（　）をお願いします。", opts:["サイン","ネーム","マーク","キーワード"], ans:0, exp:"「サイン」＝tanda tangan.", id:"Mohon tanda tangan penerimaan di sini."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>助ける</u>", opts:["兄はいつも私の宿題を助ける","警察の仕事は、市⺠を助けることだ","海でおぼれたとき、知らない男性に助けてもらった","この古い家は、1本の柱が助けている"], ans:2, exp:"「助ける」＝たすける, menolong. 海でおぼれたとき、知らない男性に助けてもらった。", id:"Saat hampir tenggelam di laut, saya ditolong oleh seorang pria yang tidak saya kenal."},
+      {q:"<u>確かに</u>", opts:["⽬が悪くなって、確かに⾒える","100万円あるかどうか、確かにわからない","昨⽇の夜8時、⽗は確かに家にいました","あの⽅は確かに⼭本さんだ"], ans:2, exp:"「確かに」＝たしかに, memang benar/pasti. 昨⽇の夜8時、⽗は確かに家にいました。", id:"Tadi malam jam 8, ayah benar-benar ada di rumah. Tidak salah."}
+    ]}
+  ]
+},
+{
+  day: 12,
+  groups: [
+    { label: "問題1", items: [
+      {q:"こんな<u>汚い</u>海では、泳げない。", opts:["うすい","きたない","わるい","ひどい"], ans:1, exp:"「汚い」＝きたない, kotor.", id:"Di laut yang sekotor ini, tidak bisa berenang."},
+      {q:"弟は私より<u>⾝⻑</u>が⾼い。", opts:["みなが","しんなが","みちょう","しんちょう"], ans:3, exp:"「⾝⻑」＝しんちょう, tinggi badan.", id:"Adik laki-laki saya lebih tinggi daripada saya."},
+      {q:"関東<u>地⽅</u>に台⾵が近づいているそうだ。", opts:["じがた","じほう","ちがた","ちほう"], ans:3, exp:"「地⽅」＝ちほう, daerah.", id:"Katanya topan sedang mendekati wilayah Kanto."}
+    ]},
+    { label: "問題2", items: [
+      {q:"私は佐藤さんが授業を休むことを先⽣に<u>つたえた</u>。", opts:["仏えた","伝えた","告えた","云えた"], ans:1, exp:"「伝えた」＝つたえた, telah menyampaikan.", id:"Saya menyampaikan kepada guru bahwa Sato tidak masuk kelas."},
+      {q:"⼤きな会社に<u>しゅうしょく</u>したからといって安⼼出来ない。", opts:["修縫","修職","就能","就職"], ans:3, exp:"「就職」＝しゅうしょく, mendapat pekerjaan.", id:"Hanya karena bekerja di perusahaan besar, tidak berarti bisa merasa aman."},
+      {q:"ダイエットに<u>せいこう</u>して10キロやせた。", opts:["正⾏","正功","成⾏","成功"], ans:3, exp:"「成功」＝せいこう, keberhasilan.", id:"Berhasil diet dan turun 10 kilogram."}
+    ]},
+    { label: "問題3", items: [
+      {q:"その店は、<u>たしか</u>この辺にあったと思うんですが…。", opts:["たぶん","必ず","確実に","絶対に"], ans:0, exp:"「たしか」≈「たぶん」, mungkin.", id:"Kalau tidak salah, toko itu seharusnya ada di sekitar sini."},
+      {q:"話し合いは<u>正午</u>まで続いた。", opts:["次の⽇","昼の12時","⼣⽅5時","夜の12時"], ans:1, exp:"「正午」＝pukul 12 siang.", id:"Diskusi berlanjut sampai tengah hari."},
+      {q:"このアルバイトは、誰にでもできる<u>単純</u>な仕事です。", opts:["⼀回だけの","⼀⼈でやる","短い時間の","難しくない"], ans:3, exp:"「単純」＝sederhana ≈「難しくない」.", id:"Pekerjaan paruh waktu ini adalah pekerjaan sederhana yang bisa dilakukan siapa saja."},
+      {q:"<u>といあわせ</u>のメールを送ったが、返事がなかった。", opts:["質問","要求","連絡","応募"], ans:0, exp:"「問い合わせ」≈「質問」, pertanyaan.", id:"Saya mengirim email pertanyaan, tetapi tidak ada balasan."}
+    ]},
+    { label: "問題4", items: [
+      {q:"この本は20年前に（　）された。", opts:["出社","出発","出版","出場"], ans:2, exp:"「出版」＝しゅっぱん, penerbitan.", id:"Buku ini diterbitkan 20 tahun yang lalu."},
+      {q:"商品の（　）は、届いてから1週間以内にお⽀払いください。", opts:["価格","⾦額","代⾦","値段"], ans:2, exp:"「代⾦」＝だいきん, biaya/pembayaran.", id:"Mohon bayar harga barang dalam waktu satu minggu setelah diterima."},
+      {q:"休⽇はたいてい、⼦どもと遊んだり、ほんを読んだりして（　）。", opts:["⽣きている","暮らしている","過ごしている","⽣活している"], ans:2, exp:"「過ごしている」＝すごしている, menghabiskan waktu.", id:"Pada hari libur biasanya saya menghabiskan waktu dengan bermain bersama anak atau membaca buku."},
+      {q:"この丸の中をペンで⾚く（　）ください。", opts:["かいて","ぬって","さして","はって"], ans:1, exp:"「塗って」＝ぬって, mengecat/mengoles.", id:"Tolong warnai bagian dalam lingkaran ini dengan pena warna merah."},
+      {q:"運転中に（　）が故障して、⾞が⽌まってしまった。", opts:["オイル","エンジン","エネルギー","ガソリン"], ans:1, exp:"「エンジン」＝mesin.", id:"Saat mengemudi, mesin rusak dan mobil pun berhenti."},
+      {q:"店にお客さんが⼀⼈もいなくて、（　）だった。", opts:["からから","がらがら","くらくら","ぐらぐら"], ans:1, exp:"「がらがら」＝kosong, suara berderak.", id:"Tidak ada satu pun pelanggan di toko itu, jadi sangat sepi."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>ちゃんと</u>", opts:["⼊社試験にはちゃんと合格した","2年前より⽇本語がちゃんとだ","読んだ本は、ちゃんと元の場所に戻してください","このかばんは、2、3⽇ちゃんとだ"], ans:2, exp:"「ちゃんと」＝dengan rapi/benar. 読んだ本は、ちゃんと元の場所に戻してください。", id:"Tolong kembalikan buku yang sudah dibaca ke tempat semula dengan rapi."},
+      {q:"<u>盛ん</u>", opts:["この町は農業が盛んだ","ここは⾃然が盛んで、緑が多い","今年の祭りは去年よりも盛んに⾏われた","もうすぐコンサートが盛んだ"], ans:0, exp:"「盛んだ」＝berkembang/meriah. この町は農業が盛んだ。", id:"Festival tahun ini diselenggarakan lebih meriah daripada tahun lalu."}
+    ]}
+  ]
+},
+{
+  day: 13,
+  groups: [
+    { label: "問題1", items: [
+      {q:"その事故の乗客は、全員<u>無事</u>だったそうだ。", opts:["ぶじ","ぶごと","むじ","むこと"], ans:0, exp:"「無事」＝ぶじ, selamat/aman.", id:"Katanya semua penumpang dalam kecelakaan itu selamat."},
+      {q:"昨⽇はずっと家で<u>読書</u>をしていました。", opts:["とくしゅ","とくしょ","どくしゅ","どくしょ"], ans:3, exp:"「読書」＝どくしょ, membaca buku.", id:"Kemarin saya seharian membaca buku di rumah."},
+      {q:"毎⽇、バスで学校に<u>通って</u>いる。", opts:["いって","かよって","とおって","むかって"], ans:1, exp:"「通って」＝かよって, pergi secara rutin.", id:"Saya pergi ke sekolah naik bus setiap hari."}
+    ]},
+    { label: "問題2", items: [
+      {q:"何か分からないことがあったら、私を<u>よんで</u>ください。", opts:["読んで","吸んで","叫んで","呼んで"], ans:3, exp:"「呼んで」＝よんで, memanggil.", id:"Kalau ada sesuatu yang tidak dimengerti, silakan panggil saya."},
+      {q:"<u>ゆうしょう</u>できるように、毎⽇頑張って練習している。", opts:["優秀","優勝","優賞","優証"], ans:1, exp:"「優勝」＝ゆうしょう, kemenangan/juara.", id:"Agar bisa menjadi juara, saya berlatih dengan giat setiap hari."},
+      {q:"30<u>びょう</u>以内でメッセージを⼊れてください。", opts:["沙","炒","砂","秒"], ans:3, exp:"「秒」＝びょう, detik (satuan waktu).", id:"Silakan masukkan pesan dalam waktu 30 detik."}
+    ]},
+    { label: "問題3", items: [
+      {q:"⺟は<u>ふだん</u>⾃転⾞で買い物に⾏く。", opts:["平⽇","休⽇","いつも","たまに"], ans:2, exp:"「ふだん」≈「いつも」, biasanya.", id:"Ibu biasanya pergi berbelanja dengan sepeda."},
+      {q:"友達の家の<u>お⼿洗い</u>はきれいにそうじされていた。", opts:["お⾵呂","洗濯機","トイレ","キッチン"], ans:2, exp:"「お⼿洗い」＝toilet.", id:"Toilet di rumah teman saya dibersihkan dengan rapi."},
+      {q:"これはとても<u>めんどう</u>な問題だ。", opts:["無理な","危ない","簡単ではない","おもしろくない"], ans:2, exp:"「めんどう」＝merepotkan ≈「簡単ではない」.", id:"Ini adalah masalah yang sangat merepotkan."},
+      {q:"辞書をひいても、<u>てきとう</u>な表現が⾒つからなかった。", opts:["ちょうどいい","なんでもいい","知っている","わかりやすい"], ans:0, exp:"「てきとう」≈「ちょうどいい」, pas/sesuai.", id:"Meskipun mencari di kamus, tidak ditemukan ungkapan yang sesuai."}
+    ]},
+    { label: "問題4", items: [
+      {q:"⽗はずいぶん前から家族旅⾏の（　）を⽴てている。", opts:["計画","計算","予想","予報"], ans:0, exp:"「計画」＝けいかく, rencana.", id:"Ayah sudah sejak lama merencanakan perjalanan keluarga."},
+      {q:"⾒学中、勝⼿な（　）をしないでください。", opts:["⾏進","⾏動","⾏事","⾏列"], ans:1, exp:"「⾏動」＝こうどう, tindakan.", id:"Selama kunjungan, mohon jangan bertindak sesuka hati."},
+      {q:"（　）、先⽉離婚したんです。", opts:["実に","実は","現実に","現在は"], ans:1, exp:"「実は」＝じつは, sebenarnya.", id:"Sebenarnya, saya bercerai bulan lalu."},
+      {q:"彼⼥の体重は、たぶん80キロ（　）だと思います。", opts:["上下","前後","以外","近所"], ans:1, exp:"「前後」＝ぜんご, kurang lebih.", id:"Saya kira berat badannya sekitar 80 kilogram."},
+      {q:"電⾞が遅れたが、⾛ったら（　）間に合った。", opts:["今にも","たった今","ぎりぎり","どきどき"], ans:2, exp:"「ぎりぎり」＝hampir saja, mepet.", id:"Kereta terlambat, tetapi karena berlari saya tepat waktu."},
+      {q:"もう少し（　）を落として運転してください。", opts:["スロー","スパイス","スピード","スペース"], ans:2, exp:"「スピード」＝kecepatan.", id:"Tolong kurangi kecepatan sedikit lagi saat mengemudi."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>何とか</u>", opts:["どこかでジュースか何とか飲みたい","今日は何とか外に出かけたい","アパートの管理人さんが何とかしてくれる","もうだめかと思ったが、何とか助かった"], ans:3, exp:"「何とか助かった」＝entah bagaimana, berhasil selamat.", id:"Saya pikir sudah tidak tertolong, tapi entah bagaimana bisa selamat."},
+      {q:"<u>今ごろ</u>", opts:["今ごろになって、ようやく本当のことを知った","空が曇ってきて、今ごろ雨が降りそうだ","遅かったね。今ごろどうしたの","もうだめかと思ったが、今ごろ助かった"], ans:0, exp:"「今ごろ」＝baru belakangan ini. 今ごろになって、ようやく本当のことを知った。", id:"Baru sekarang akhirnya saya mengetahui kebenaran yang sebenarnya."}
+    ]}
+  ]
+},
+{
+  day: 14,
+  groups: [
+    { label: "問題1", items: [
+      {q:"それは<u>破れて</u>いるので、こっちのを使ってください。", opts:["おれて","われて","こわれて","やぶれて"], ans:3, exp:"「破れて」＝やぶれて, sobek.", id:"Karena itu sudah robek, silakan gunakan yang ini."},
+      {q:"かばんを<u>机</u>の上に置いた。", opts:["だい","たな","ゆか","つくえ"], ans:3, exp:"「机」＝つくえ, meja.", id:"Saya meletakkan tas di atas meja."},
+      {q:"この野菜は<u>嫌い</u>です。", opts:["きつい","きらい","くさい","にがい"], ans:1, exp:"「嫌い」＝きらい, tidak suka.", id:"Saya tidak suka sayuran ini."}
+    ]},
+    { label: "問題2", items: [
+      {q:"紙などの<u>もえる</u>ごみは、ここに捨ててください。", opts:["然える","焼える","暁える","燃える"], ans:3, exp:"「燃える」＝もえる, terbakar.", id:"Sampah yang bisa dibakar seperti kertas, silakan buang di sini."},
+      {q:"このテレビには最新の<u>ぎじゅつ</u>が使われている。", opts:["伎術","技術","枝術","妓術"], ans:1, exp:"「技術」＝ぎじゅつ, teknologi/keterampilan.", id:"Televisi ini menggunakan teknologi terbaru."},
+      {q:"その会社の社⻑は、⼦どもたちに多くの<u>ざいさん</u>を残した。", opts:["材算","材産","財算","財産"], ans:3, exp:"「財産」＝ざいさん, harta kekayaan/aset.", id:"Presiden perusahaan itu meninggalkan banyak harta kepada anak-anaknya."}
+    ]},
+    { label: "問題3", items: [
+      {q:"もっとお⾦を<u>もうける</u>にはどうすればいいだろうか。", opts:["ためる","もらう","⼿に⼊る","⼿に⼊れる"], ans:3, exp:"「もうける」≈「⼿に⼊れる」, mendapatkan (secara usaha).", id:"Apa yang harus dilakukan agar bisa mendapatkan lebih banyak uang ya?"},
+      {q:"この町は<u>活気</u>がある。", opts:["きれいだ","にぎやかだ","空気がいい","⾃然が多い"], ans:1, exp:"「活気」≈「にぎやかだ」, ramai.", id:"Kota ini penuh dengan kehidupan / ramai."},
+      {q:"<u>よその</u>家の⽝が庭に⼊ってきた。", opts:["隣の","他の","近くの","あそこの"], ans:1, exp:"「よその」≈「他の」, milik orang lain.", id:"Anjing dari rumah lain masuk ke halaman."},
+      {q:"あの店の店員はいつも<u>にこにこ</u>している。", opts:["笑顔だ","不親切だ","静かだ","話している"], ans:0, exp:"「にこにこ」≈「笑顔だ」, tersenyum.", id:"Pegawai toko itu selalu tersenyum."}
+    ]},
+    { label: "問題4", items: [
+      {q:"休む場合は、（　）連絡してください。", opts:["前回","この前","以前に","事前に"], ans:3, exp:"「事前に」＝じぜんに, sebelumnya (dengan persiapan).", id:"Jika akan libur, harap hubungi terlebih dahulu."},
+      {q:"すみません、千円札を10枚に（　）してもらえませんか。", opts:["交代","⼩銭","変更","両替"], ans:3, exp:"「両替」＝りょうがえ, menukar uang.", id:"Permisi, bisakah menukarkan uang ini menjadi 10 lembar uang seribu yen?"},
+      {q:"事件がやっと（　）した。", opts:["解決","解答","決断","決定"], ans:0, exp:"「解決」＝かいけつ, penyelesaian masalah.", id:"Kasus itu akhirnya terselesaikan."},
+      {q:"社⻑は、社員と⾷事に⾏っても1円も多く払わない（　）ひとだ。", opts:["けちな","むだな","いじわるな","わがままな"], ans:0, exp:"「けちな」＝pelit.", id:"Direktur itu orang yang pelit; meskipun makan bersama karyawan, ia tidak mau membayar lebih satu yen pun."},
+      {q:"ホテルには泊まらず、（　）で温泉に⾏った。", opts:["往復","⽚道","⽇帰り","⾏き帰り"], ans:2, exp:"「⽇帰り」＝ひがえり, pergi pulang di hari yang sama.", id:"Saya tidak menginap di hotel, melainkan pergi ke onsen pulang-pergi dalam sehari."},
+      {q:"AチームとBチームの試合は、3対3の（　）だった。", opts:["同時","あいこ","いっしょ","引き分け"], ans:3, exp:"「引き分け」＝hasil imbang.", id:"Pertandingan tim A dan tim B berakhir imbang 3–3."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>遅刻</u>", opts:["私の腕時計は3分くらい遅刻している","寝坊して、約束の時間に遅刻してしまった","電⾞が遅刻していて、困った","問題が⾒つかったため遅刻した"], ans:1, exp:"「遅刻」＝terlambat ke hal yang sudah ditentukan. 寝坊して、約束の時間に遅刻してしまった。", id:"Karena bangun kesiangan, saya terlambat ke janji."},
+      {q:"<u>思わず</u>", opts:["買い物をしていたら、思わず雨が降った","今までさしみは⾷べたことがない","その⼥性は30歳ぐらいに見えた","突然⽬の前に⽝が現れたので、思わず「わっ」と⼤きな声を出してしまった"], ans:3, exp:"「思わず」＝tanpa sengaja/reflek. 突然⽬の前に⽝が現れたので、思わず「わっ」と⼤きな声を出してしまった。", id:"Tiba-tiba seekor anjing muncul di depan saya, tanpa sadar saya berteriak keras 'wah!'."}
+    ]}
+  ]
+},
+{
+  day: 15,
+  groups: [
+    { label: "問題1", items: [
+      {q:"駅前でアンケート<u>調査</u>を⾏った。", opts:["しゅうさ","しょうさ","ちゅうさ","ちょうさ"], ans:3, exp:"「調査」＝ちょうさ, survei/penyelidikan.", id:"Melakukan survei kuesioner di depan stasiun."},
+      {q:"<u>妻</u>は病院で働いています。", opts:["あね","つま","よめ","むすめ"], ans:1, exp:"「妻」＝つま, istri.", id:"Istri saya bekerja di rumah sakit."},
+      {q:"⺟は仕事のあと、いつもスーパーに<u>寄って</u>帰る。", opts:["いって","かって","そって","よって"], ans:3, exp:"「寄って」＝よって, singgah.", id:"Setelah bekerja, ibu selalu mampir ke supermarket sebelum pulang."},
+      {q:"⼀⽣懸命勉強したら、<u>せいせき</u>が上がった。", opts:["成積","成績","整積","整額"], ans:1, exp:"「成績」＝せいせき, nilai.", id:"Karena belajar dengan sungguh-sungguh, prestasi/nilai saya meningkat."},
+      {q:"<u>わかい</u>とき、よく⼀⼈で外国を旅⾏した。", opts:["若い","苦い","幼い","⾟い"], ans:0, exp:"「若い」＝わかい, muda.", id:"Waktu masih muda, saya sering bepergian ke luar negeri sendirian."},
+      {q:"この図書館には、<u>かち</u>のある古い本がたくさんある。", opts:["価格","価値","加格","加値"], ans:1, exp:"「価値」＝かち, nilai (value).", id:"Di perpustakaan ini ada banyak buku tua yang bernilai."}
+    ]},
+    { label: "問題3", items: [
+      {q:"A：どうぞこちらに<u>おかけください</u>。 B：ありがとうございます。「おかけください」とは？", opts:["⼊ってください","置いてください","座ってください","進んでください"], ans:2, exp:"「おかけください」＝座る, silakan duduk.", id:"A: Silakan duduk di sini. B: Terima kasih."},
+      {q:"⾳楽が好きな友⼈にCDを<u>贈った</u>。", opts:["あげた","貸した","借りた","もらった"], ans:0, exp:"「贈った」≈「あげた」, memberi.", id:"Saya menghadiahkan CD kepada teman yang suka musik."},
+      {q:"試験の内容については<u>当⽇</u>まで、何もわからない。", opts:["あした","前の⽇","あの⽇","その⽇"], ans:3, exp:"「当⽇」＝その⽇, hari tersebut/hari-H.", id:"Isi ujian tidak diketahui sama sekali sampai hari-H."},
+      {q:"<u>おしまいに</u>、校⻑先⽣からお話があります。", opts:["あとで","さきに","おわりに","はじめに"], ans:2, exp:"「おしまいに」≈「おわりに」, di akhir.", id:"Terakhir, kepala sekolah akan menyampaikan sambutan."}
+    ]},
+    { label: "問題4", items: [
+      {q:"チーム全員が（　）で戦ったが、負けてしまった。", opts:["強⼒","協⼒","全⼒","努⼒"], ans:2, exp:"「全⼒」＝ぜんりょく, sepenuh tenaga.", id:"Seluruh tim bertanding dengan segenap tenaga, tetapi akhirnya kalah."},
+      {q:"今は（　）がないので、何も⾷べたくありません。", opts:["⾷材","⾷料","⾷欲","⾷物"], ans:2, exp:"「⾷欲」＝しょくよく, nafsu makan.", id:"Sekarang saya tidak nafsu makan, jadi tidak ingin makan apa pun."},
+      {q:"電話の声は（　）が悪かったが、会ってみたらいい⼈だった。", opts:["考え","感じ","気分","様⼦"], ans:1, exp:"「感じ」＝かんじ, perasaan/kesan.", id:"Suaranya di telepon terdengar tidak enak, tapi setelah bertemu ternyata orang baik."},
+      {q:"彼⼥の⽣き⽅は多くの⼈々に影響を（　）。", opts:["あげた","⾒せた","もらった","あたえた"], ans:3, exp:"「与えた」＝あたえた, memberikan (pengaruh).", id:"Cara hidupnya memberi pengaruh kepada banyak orang."},
+      {q:"この（　）がある店には、⽝を連れて⼊ることができる。", opts:["シート","ぺット","マーク","ルール"], ans:2, exp:"「マーク」＝tanda.", id:"Di toko yang ada tanda ini, boleh masuk dengan membawa anjing."},
+      {q:"（　）が向いたら、今夜のパーティーに来てください。", opts:["⾜","気","⽬","背"], ans:1, exp:"「気が向いたら」＝jika sedang berminat/mood.", id:"Kalau berkenan / kalau sedang ingin, silakan datang ke pesta malam ini."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>次々に</u>", opts:["少⼦化が進むと、⼈⼝が次々に減る","名前を呼ばれた⼈から急に次々に話す","⽌まらないで、次々に歩く","料理が次々に運ばれてくるので、いくら⾷べてもなくならない"], ans:3, exp:"「次々に」＝berturut-turut. 料理が次々に運ばれてくるので、いくら⾷べてもなくならない。", id:"Karena hidangan terus berdatangan, seberapa pun dimakan tidak habis-habis."},
+      {q:"<u>故障</u>", opts:["かばんが故障して、⽳があいた","パソコンが故障してしまい、使えなくなった","⼤地震のため、⽔道が故障した","ボールが当たって、窓が故障した"], ans:1, exp:"「故障」＝rusak (khususnya mesin/peralatan). パソコンが故障してしまい、使えなくなった。", id:"Komputer rusak sehingga tidak bisa digunakan."}
+    ]}
+  ]
+},
+{
+  day: 16,
+  groups: [
+    { label: "問題1", items: [
+      {q:"今の時代はパソコンの<u>知識</u>が必要だ。", opts:["じしき","じちき","ちしき","ちじき"], ans:2, exp:"「知識」＝ちしき, pengetahuan.", id:"Zaman sekarang pengetahuan komputer diperlukan."},
+      {q:"弟は<u>熱⼼</u>にその本を読んでいた。", opts:["ねしん","ねつしん","ねっしん","ねつじん"], ans:2, exp:"「熱⼼」＝ねっしん, giat/antusias.", id:"Adik laki-laki saya membaca buku itu dengan sungguh-sungguh."},
+      {q:"夜遅くタクシーに乗ると、<u>深夜</u>料⾦がかかる。", opts:["しんや","しんよ","ふかや","ふかよ"], ans:0, exp:"「深夜」＝しんや, tengah malam.", id:"Jika naik taksi larut malam, akan dikenakan tarif tengah malam."}
+    ]},
+    { label: "問題2", items: [
+      {q:"この建物はとても古い<u>れきし</u>がある。", opts:["歴史","歴使","曆史","曆吏"], ans:0, exp:"「歴史」＝れきし, sejarah.", id:"Bangunan ini memiliki sejarah yang sangat tua."},
+      {q:"<u>とくい</u>な料理は何ですか。", opts:["得意","得居","特意","特居"], ans:0, exp:"「得意」＝とくい, pandai/mahir.", id:"Masakan apa yang paling Anda kuasai?"},
+      {q:"⼤きく息を<u>すって</u>ください。", opts:["叫って","叱って","吸って","呼って"], ans:2, exp:"「吸って」＝すって, mengisap (napas).", id:"Silakan tarik napas dalam-dalam."}
+    ]},
+    { label: "問題3", items: [
+      {q:"<u>たまたま</u>この駅で電⾞を降りたら、ホームに加藤さんがいた。", opts:["偶然","ちょうど","間違えて","約束して"], ans:0, exp:"「たまたま」≈「偶然」, kebetulan.", id:"Kebetulan ketika turun di stasiun ini, Pak Kato ada di peron."},
+      {q:"この雑誌の<u>おもな</u>読者はサラリーマンだ。", opts:["⼤事な","すべての","代表的な","具体的な"], ans:2, exp:"「主な」＝おもな, utama/representatif.", id:"Pembaca utama majalah ini adalah para pekerja kantoran."},
+      {q:"<u>おたより</u>ありがとうございます。", opts:["お電話","お⼿紙","ご⼼配","ご注⽂"], ans:1, exp:"「お便り」＝おたより, surat.", id:"Terima kasih atas surat/kabar yang Anda kirimkan."},
+      {q:"その選⼿は1年間でずいぶん<u>腕をあげた</u>。", opts:["やめた","上⼿になった","体⼒をつけた","有名になった"], ans:1, exp:"「腕を上げた」＝menjadi lebih mahir.", id:"Atlet itu sangat meningkatkan kemampuannya dalam satu tahun."}
+    ]},
+    { label: "問題4", items: [
+      {q:"この美術館の⼊場（　）は1200円です。", opts:["⾦","賃","費","料"], ans:3, exp:"「⼊場料」＝にゅうじょうりょう, biaya masuk.", id:"Biaya masuk museum seni ini adalah 1.200 yen."},
+      {q:"観客が⼤声で試合の（　）をしている。", opts:["援助","応援","⽀援","救助"], ans:1, exp:"「応援」＝おうえん, dukungan.", id:"Para penonton memberi dukungan pertandingan dengan suara keras."},
+      {q:"50円切⼿3枚と80円切⼿5枚で、（　）いくらになりますか。", opts:["会計","合計","計算","算数"], ans:1, exp:"「合計」＝ごうけい, jumlah total.", id:"Berapa totalnya untuk 3 perangko 50 yen dan 5 perangko 80 yen?"},
+      {q:"⺟は温室でバラの花を（　）。", opts:["飼っている","育てている","⽣んでいる","⼿伝っている"], ans:1, exp:"「育てている」＝そだてる, membesarkan/merawat.", id:"Ibu menanam/merawat bunga mawar di rumah kaca."},
+      {q:"急に旅⾏に⾏けなくなったので、ホテルの予約を（　）した。", opts:["カバー","オーバー","ストップ","キャンセル"], ans:3, exp:"「キャンセル」＝membatalkan.", id:"Karena tiba-tiba tidak bisa pergi berlibur, saya membatalkan reservasi hotel."},
+      {q:"窓を開けると、⿃の鳴き（　）が聞こえた。", opts:["⾳","声","曲","話"], ans:1, exp:"「⿃の鳴き声」＝なきごえ, suara burung.", id:"Saat membuka jendela, terdengar suara kicauan burung."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>めったに</u>", opts:["私は朝はめったにご飯を⾷べる","このあたりで雪が降ることはめったにない","昔は、外国に⾏く⼈がめったにいた","隣の部屋の⼈とは、めったに会う"], ans:1, exp:"「めったに〜ない」＝hampir tidak pernah. このあたりで雪が降ることはめったにない。", id:"Di daerah ini hampir tidak pernah turun salju."},
+      {q:"<u>きょろきょろ</u>", opts:["髪を切ったら、友達にきょろきょろ⾔われた","あの⼈はさっきからきょろきょろ歩いている","ここがどこかわからなくなって、まわりをきょろきょろ⾒た","彼は⼈に気づかれないようにきょろきょろ隠れた"], ans:2, exp:"「きょろきょろ」＝celingak-celinguk. ここがどこかわからなくなって、まわりをきょろきょろ⾒た。", id:"Karena tidak tahu berada di mana, saya melihat ke sekeliling dengan gelisah."}
+    ]}
+  ]
+},
+{
+  day: 17,
+  note: "Catatan: pada sumber asli, soal Day 17 tidak memiliki teks pertanyaan (kosong/placeholder), sehingga hari ini dilewati dari kuis.",
+  groups: [
+  ]
+},
+{
+  day: 18,
+  groups: [
+    { label: "問題1", items: [
+      {q:"計画のとおりに<u>実⾏</u>するのは難しい。", opts:["じっこう","じつこう","じつぎょう","じっぎょう"], ans:0, exp:"「実⾏」＝じっこう, pelaksanaan.", id:"Melaksanakan sesuatu sesuai rencana itu sulit."},
+      {q:"私は⼤阪<u>出⾝</u>です。", opts:["しゅしん","しゅつしん","しゅっしん","しゅうしん"], ans:2, exp:"「出⾝」＝しゅっしん, berasal dari.", id:"Saya berasal dari Osaka."},
+      {q:"斎藤さんと⼀緒に学校を出て、駅で<u>別れた</u>。", opts:["われた","わかれた","わけれた","べつれた"], ans:1, exp:"「別れた」＝わかれた, berpisah.", id:"Saya keluar dari sekolah bersama Saito-san, lalu berpisah di stasiun."}
+    ]},
+    { label: "問題2", items: [
+      {q:"おいしいものを⾷べているときが、⼀番<u>しあわせ</u>だ。", opts:["⽺せ","⾟せ","幸せ","宰せ"], ans:2, exp:"「幸せ」＝しあわせ, kebahagiaan.", id:"Saat makan makanan enak adalah saat paling bahagia."},
+      {q:"<u>こくさい</u>結婚をする⼈が増えているそうだ。", opts:["交祭","交際","国祭","国際"], ans:3, exp:"「国際」＝こくさい, internasional.", id:"Katanya, jumlah orang yang melakukan pernikahan internasional semakin bertambah."},
+      {q:"この会社では、毎⽉25⽇に<u>きゅうりょう</u>が⽀払われる。", opts:["給科","給料","結科","結料"], ans:1, exp:"「給料」＝きゅうりょう, gaji.", id:"Di perusahaan ini, gaji dibayarkan setiap tanggal 25 setiap bulan."}
+    ]},
+    { label: "問題3", items: [
+      {q:"昨⽇会ったとき、彼は<u>そうとう</u>疲れているように⾒えた。", opts:["よく","かなり","たぶん","とうとう"], ans:1, exp:"「そうとう」≈「かなり」, cukup/lumayan.", id:"Saat bertemu kemarin, dia terlihat sangat lelah."},
+      {q:"このかばんはとても<u>じょうぶ</u>に作られている。", opts:["重く","こまかく","きれいに","こわれにくく"], ans:3, exp:"「じょうぶ」≈「こわれにくく」, tahan lama.", id:"Tas ini dibuat dengan sangat kuat/tahan lama."},
+      {q:"社⻑はその店で⼀番⾼いワインを<u>たのんだ</u>。", opts:["選んだ","飲んだ","質問した","注⽂した"], ans:3, exp:"「たのんだ」≈「注⽂した」, memesan.", id:"Direktur memesan anggur termahal di toko itu."},
+      {q:"お客様への<u>メッセージ</u>をお預かりしています。", opts:["書類","伝⾔","留守電","贈り物"], ans:1, exp:"「メッセージ」≈「伝⾔」, pesan singkat.", id:"Kami sedang menerima/menitipkan pesan untuk pelanggan."}
+    ]},
+    { label: "問題4", items: [
+      {q:"体育館を使うときは、先⽣の（　）をとってください。", opts:["必要","許可","可能","信頼"], ans:1, exp:"「許可」＝きょか, izin.", id:"Saat menggunakan gedung olahraga, harap minta izin kepada guru."},
+      {q:"池⽥さんが乗る⾶⾏機は、どの（　）ですか。", opts:["台","号","便","機"], ans:2, exp:"「便」＝びん, nomor penerbangan.", id:"Pesawat yang akan ditumpangi Ikeda-san adalah penerbangan yang mana?"},
+      {q:"ずっとほしかった本を買いに⾏ったが、（　）で買えなかった。", opts:["売り上げ","売れ⾏き","売り切れ","売り出し"], ans:2, exp:"「売り切れ」＝kehabisan stok, terjual habis.", id:"Saya pergi untuk membeli buku yang sudah lama saya inginkan, tetapi tidak bisa membelinya karena sudah habis."},
+      {q:"教えてもらった電話番号に何度かけても（　）。", opts:["とどかない","むすばない","くっつかない","つながらない"], ans:3, exp:"「つながらない」＝tidak terhubung.", id:"Meskipun menelepon berkali-kali ke nomor yang diberikan, tetap tidak tersambung."},
+      {q:"昨⽇けんかしていた⼆⼈が、今⽇はもう（　）したようだ。", opts:["⽚付け","付き合い","仲直り","元通り"], ans:2, exp:"「仲直り」＝なかなおり, berdamai.", id:"Dua orang yang bertengkar kemarin tampaknya sudah berdamai hari ini."},
+      {q:"けさの気温は（　）5度だった。", opts:["クール","ダウン","コールド","マイナス"], ans:3, exp:"「マイナス5度」＝suhu minus 5°C.", id:"Suhu pagi ini adalah minus 5 derajat."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>思い出す</u>", opts:["昨⽇の夜何をたべたか、どうしても思い出さない","国王は、この国の将来を思い出した","あのときの事故のことを思い出してください","ペットに名前を付けたことを思い出すべきだ"], ans:0, exp:"「思い出す」＝mengingat sesuatu. 昨⽇の夜何をたべたか、どうしても思い出さない。", id:"Saya sama sekali tidak bisa mengingat apa yang saya makan tadi malam."},
+      {q:"<u>⼤して</u>", opts:["この建物は⼤してりっぱだ","⼥性は⼤して男性より背が低い","その映画は、⼤してよくなかった","学⽣は、勉強も遊びも⼤してする"], ans:2, exp:"「⼤して〜ない」＝tidak terlalu. その映画は、⼤してよくなかった。", id:"Film itu tidak terlalu bagus."}
+    ]}
+  ]
+},
+{
+  day: 19,
+  groups: [
+    { label: "問題1", items: [
+      {q:"この会社には<u>独⾝</u>の⼈が多い。", opts:["とくしん","とくじん","どくしん","どくじん"], ans:2, exp:"「独⾝」＝どくしん, lajang.", id:"Di perusahaan ini, banyak orang yang masih lajang."},
+      {q:"明⽇は⻭ブラシと<u>下着</u>を忘れないでください。", opts:["かぎ","したぎ","かちゃく","したちゃく"], ans:1, exp:"「下着」＝したぎ, pakaian dalam.", id:"Besok jangan lupa membawa sikat gigi dan pakaian dalam."},
+      {q:"⼦どもとボールを<u>投げて</u>遊んだ。", opts:["あげて","なげて","にげて","ぬげて"], ans:1, exp:"「投げて」＝なげて, melempar.", id:"Saya bermain melempar bola bersama anak."}
+    ]},
+    { label: "問題2", items: [
+      {q:"東京は<u>ぶっか</u>が⾼くて⽣活が⼤変だ。", opts:["物值","物価","物貨","物賃"], ans:1, exp:"「物価」＝ぶっか, harga barang.", id:"Harga-harga di Tokyo mahal sehingga hidup terasa berat."},
+      {q:"新しい<u>くうこう</u>ができて、海外に⾏くのが便利になった。", opts:["空⾏","空港","航⾏","航空"], ans:1, exp:"「空港」＝くうこう, bandara.", id:"Bandara baru telah dibangun, sehingga bepergian ke luar negeri menjadi lebih mudah."},
+      {q:"家の前の<u>どうろ</u>は、夜でも⾞がよく通ってうるさい。", opts:["歩道","通路","道路","連絡"], ans:2, exp:"「道路」＝どうろ, jalan umum.", id:"Jalan di depan rumah sering dilewati mobil bahkan malam hari, jadi berisik."}
+    ]},
+    { label: "問題3", items: [
+      {q:"新しい家は<u>キッチン</u>が広い。", opts:["台所","居間","⽞関","寝室"], ans:0, exp:"「キッチン」≈「台所」, dapur.", id:"Rumah baru ini dapurnya luas."},
+      {q:"⾬は<u>そのうち</u>やむだろう。", opts:["すぐに","今⽇中に","しばらくしたら","だいぶ待ったら"], ans:2, exp:"「そのうち」≈「しばらくしたら」, setelah beberapa saat.", id:"Hujannya mungkin akan berhenti sebentar lagi."},
+      {q:"会議中は<u>⼿軽に</u>⾷べられるもののほうがいい。", opts:["簡単に","少しだけ","⼀⼈ずつ","⼿に取って"], ans:0, exp:"「⼿軽に」≈「簡単に」, dengan mudah.", id:"Saat rapat, lebih baik makanan yang mudah dimakan."},
+      {q:"A: このニュース、知っていますか？ B: ええ、<u>もちろん</u>知っていますよ。「もちろん」とは？", opts:["当然","全部","⾃然に","完全に"], ans:0, exp:"「もちろん」≈「当然」, wajar.", id:"A: Apakah kamu tahu berita ini? B: Ya, tentu saja tahu."}
+    ]},
+    { label: "問題4", items: [
+      {q:"すみませんが、乗⾞券を（　）してもよろしいですか。", opts:["⾒物","ご覧","拝⾒","お伺い"], ans:2, exp:"「拝⾒」＝はいけん, melihat (bentuk sopan).", id:"Permisi, bolehkah saya melihat tiket Anda?"},
+      {q:"⼀⽣懸命作りましたが、おいしいかどうか（　）がありません。", opts:["⾃信","⾃慢","期待","満⾜"], ans:0, exp:"「⾃信」＝percaya diri.", id:"Saya membuatnya dengan sungguh-sungguh, tapi tidak yakin apakah rasanya enak."},
+      {q:"このグラフは、⽇本に来る留学⽣数の変化を（　）いる。", opts:["描いて","⽰して","⾒せて","展⽰して"], ans:1, exp:"「⽰して」＝しめす, menunjukkan.", id:"Grafik ini menunjukkan perubahan jumlah pelajar asing yang datang ke Jepang."},
+      {q:"これから（　）何があっても、家族は守っていく。", opts:["たしか","たとえ","たぶん","たまに"], ans:1, exp:"「たとえ」＝meskipun.", id:"Mulai sekarang, apa pun yang terjadi, saya akan melindungi keluarga."},
+      {q:"宿題は必ず（　）までに出してください。", opts:["きまり","うけつけ","うけとり","しめきり"], ans:3, exp:"「締め切り」＝しめきり, batas waktu.", id:"Tolong kumpulkan tugas sebelum batas waktu."},
+      {q:"皆、寒くて（　）ふるえていた。", opts:["ぶつぶつ","ぶらぶら","ぶるぶる","ぶんぶん"], ans:2, exp:"「ぶるぶる」＝menggigil.", id:"Semuanya gemetar karena kedinginan."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>しまう</u>", opts:["⽫洗いをしまったら、寝る","作成したデータをパソコンにしまう","机の上にあった本や雑誌を、棚にしまった","ずっとそうじをしまっている"], ans:2, exp:"「しまう」＝menyimpan kembali. 机の上にあった本や雑誌を、棚にしまった。", id:"Saya menyimpan buku dan majalah yang ada di atas meja ke rak."},
+      {q:"<u>まじめ</u>", opts:["仕事でまじめな失敗をした","彼はまじめだから、宿題を忘れない","外国に⾏ったとき、まじめだった","⽊村さんは時間にまじめな⼈だから、約束の時間に遅れたことがない"], ans:3, exp:"「時間にまじめ」＝tepat waktu. ⽊村さんは時間にまじめな⼈だから、約束の時間に遅れたことがない。", id:"Karena Kimura-san orang yang tepat waktu, dia tidak pernah terlambat dari waktu janji."}
+    ]}
+  ]
+},
+{
+  day: 20,
+  groups: [
+    { label: "問題1", items: [
+      {q:"今の<u>状況</u>を説明してください。", opts:["しょうぎょう","しょうぎゅう","じょうきゅう","じょうきょう"], ans:3, exp:"「状況」＝じょうきょう, situasi.", id:"Silakan jelaskan situasi saat ini."},
+      {q:"駅前の⾚い<u>看板</u>の前で待っています。", opts:["かんばん","かんぱん","がんばん","がんはん"], ans:0, exp:"「看板」＝かんばん, papan nama.", id:"Saya menunggu di depan papan reklame merah di depan stasiun."},
+      {q:"隣の⼈はいつも<u>夜中</u>にジョギングをしているようだ。", opts:["よなか","やちゅう","よるなか","よるじゅう"], ans:0, exp:"「夜中」＝よなか, tengah malam.", id:"Orang di sebelah sepertinya selalu jogging tengah malam."}
+    ]},
+    { label: "問題2", items: [
+      {q:"世界の⼈⼝は、もうすぐ70<u>おく</u>⼈になるそうだ。", opts:["意","億","憶","臆"], ans:1, exp:"「億」＝おく, 100 juta.", id:"Jumlah penduduk dunia kabarnya akan segera mencapai 7 miliar orang."},
+      {q:"彼はいつも熱⼼に働くので、みんな<u>かんしん</u>している。", opts:["関⼼","関信","感⼼","感信"], ans:2, exp:"「感⼼」＝かんしん, kagum.", id:"Karena dia selalu bekerja dengan giat, semua orang kagum padanya."},
+      {q:"寒くなってきたので、<u>あつい</u>コートを買った。", opts:["熱い","重い","厚い","暑い"], ans:2, exp:"「厚い」＝あつい, tebal.", id:"Karena mulai dingin, saya membeli mantel tebal."}
+    ]},
+    { label: "問題3", items: [
+      {q:"⽥中さんが名前を呼んだのに、⾼橋さんは<u>無視した</u>。", opts:["いなくなった","別の⼈を⾒た","⾒えなかった","返事をしなかった"], ans:3, exp:"「無視した」＝mengabaikan ≈「返事をしなかった」.", id:"Meskipun Tanaka-san memanggil namanya, Takahashi-san mengabaikannya."},
+      {q:"美術館はとても<u>乱雑</u>していた。", opts:["こんで","すいて","よごれて","かたづいて"], ans:0, exp:"「乱雑」≈ ramai/berantakan, dalam konteks ini「こんで」.", id:"Museum seni itu sangat berantakan."},
+      {q:"使い終わったら、先の箱に<u>戻して</u>ください。", opts:["直して","並べて","置いて","返して"], ans:3, exp:"「戻す」≈「返して」, mengembalikan.", id:"Setelah selesai digunakan, tolong kembalikan ke kotak semula."},
+      {q:"遠⾜が中⽌になったと聞いて、⽣徒たちは<u>しょんぼり</u>した。", opts:["驚いた","怒りだした","さわぎだした","元気がなくなった"], ans:3, exp:"「しょんぼり」＝lesu ≈「元気がなくなった」.", id:"Mendengar bahwa acara piknik dibatalkan, para murid menjadi sedih dan lesu."}
+    ]},
+    { label: "問題4", items: [
+      {q:"「いいえ、違います」と彼ははっきり（　）した。", opts:["注意","選択","否定","判断"], ans:2, exp:"「否定」＝ひてい, menyangkal.", id:"'Tidak, itu salah,' katanya dengan tegas sambil menyangkal."},
+      {q:"その問題について⻑い時間話し合ったが、最後まで（　）は出なかった。", opts:["正確","解決","結果","結論"], ans:3, exp:"「結論」＝けつろん, kesimpulan.", id:"Kami membahas masalah itu cukup lama, tetapi sampai akhir tidak ada kesimpulan."},
+      {q:"⽇本⼈男性の（　）⾝⻑は約172センチだそうだ。", opts:["⼀般","基本","平均","普通"], ans:2, exp:"「平均」＝へいきん, rata-rata.", id:"Tinggi badan rata-rata pria Jepang katanya sekitar 172 cm."},
+      {q:"私は5⼈兄弟だが、みんな（　）性格が違う。", opts:["あれこれ","あちこち","それぞれ","ときどき"], ans:2, exp:"「それぞれ」＝masing-masing.", id:"Saya bersaudara lima orang, tetapi masing-masing memiliki kepribadian yang berbeda."},
+      {q:"コーヒーが（　）ときは、ミルクを⼊れて飲みます。", opts:["こい","からい","くろい","つよい"], ans:0, exp:"「濃い」＝こい, pekat.", id:"Jika kopinya terlalu kental/pekat, saya menambahkan susu lalu meminumnya."},
+      {q:"⼊院中は何度も（　）に来てくださって、ありがとうございました。", opts:["お祝い","お⾒合い","お⾒舞い","⾒送り"], ans:2, exp:"「お⾒舞い」＝おみまい, menjenguk.", id:"Terima kasih sudah berkali-kali datang menjenguk saya selama dirawat di rumah sakit."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>持参</u>", opts:["彼⼥に誕⽣⽇プレゼントを持参する","明⽇はおべんとうを持参してください","さいふを持参するのを忘れた","その研究所には、宇宙関連の機材を持参した"], ans:1, exp:"「持参」＝じさん, membawa sendiri. 明⽇はおべんとうを持参してください。", id:"Tolong bawa bekal makan siang besok."},
+      {q:"<u>ドライブ</u>", opts:["⼤きいバイクをドライブした","ドライブの免許は何歳から取れますか","今度の休みに、海へドライブに⾏こう","彼のドライブは乱暴な運転だ"], ans:2, exp:"「ドライブ」＝berkendara untuk rekreasi. 今度の休みに、海へドライブに⾏こう。", id:"Pada libur berikutnya, mari pergi berkendara ke laut."}
+    ]}
+  ]
+}
+];
+
+// ===== KADAI DATA (final, underlined) =====
+const KADAI_PART3 = [
+{
+  day: 21,
+  groups: [
+    { label: "問題1", items: [
+      {q:"もう全部飲んだから、そのビンは<u>空</u>ですよ。", opts:["あき","から","くう","そら"], ans:1, exp:"「空」＝から, kosong.", id:"Karena sudah diminum semua, botol itu kosong."},
+      {q:"この道は<u>狭い</u>ので、運転しにくい。", opts:["かたい","こわい","せまい","くらい"], ans:2, exp:"「狭い」＝せまい, sempit.", id:"Jalan ini sempit, jadi sulit untuk menyetir."},
+      {q:"⼦どもの<u>成⻑</u>は早い。", opts:["せいしょう","せいじょう","せいちょう","せいちゅう"], ans:2, exp:"「成⻑」＝せいちょう, pertumbuhan.", id:"Pertumbuhan anak-anak sangat cepat."}
+    ]},
+    { label: "問題2", items: [
+      {q:"休みの⽇はいつもプールで<u>およいで</u>います。", opts:["永いで","泳いで","氷いで","浴いで"], ans:1, exp:"「泳いで」＝およいで, berenang.", id:"Pada hari libur, saya selalu berenang di kolam renang."},
+      {q:"私はこれから、研究者として⽣きていくことを<u>けっしん</u>した。", opts:["決⼼","結⼼","決信","結信"], ans:0, exp:"「決⼼」＝けっしん, tekad/keputusan kuat.", id:"Saya memutuskan untuk menjalani hidup sebagai peneliti mulai sekarang."},
+      {q:"⼥性が夜遅くに⼀⼈で歩くのは<u>きけん</u>だ。", opts:["危県","危検","危険","危剣"], ans:2, exp:"「危険」＝きけん, berbahaya.", id:"Berbahaya bagi perempuan berjalan sendirian larut malam."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この⼭の<u>ゆたかな</u>⾃然を、⼦供たちの世代まで残したい。", opts:["きれいな","すくない","たいせつな","たくさんの"], ans:3, exp:"「ゆたかな」≈「たくさんの」, banyak (kaya alam).", id:"Saya ingin mewariskan alam yang kaya di gunung ini sampai generasi anak-anak."},
+      {q:"毎⽇1時間は<u>トレーニング</u>をしている。", opts:["練習","活動","競争","試合"], ans:0, exp:"「トレーニング」≈「練習」, latihan.", id:"Saya berlatih setidaknya satu jam setiap hari."},
+      {q:"本当に<u>思いやり</u>がある⼈だ。", opts:["⼈を許す","⼀⽣懸命な","⼈を信じる","相⼿のことを考える"], ans:3, exp:"「思いやり」≈「相⼿のことを考える」, memikirkan perasaan lawan.", id:"Dia benar-benar orang yang penuh perhatian."},
+      {q:"この⼦は兄弟の中で⼀番<u>おとなしい</u>。", opts:["静か","頭がいい","年が上だ","しっかりしている"], ans:0, exp:"「おとなしい」≈「静か」, tenang/tidak gaduh.", id:"Anak ini yang paling pendiam di antara saudara-saudaranya."}
+    ]},
+    { label: "問題4", items: [
+      {q:"毎朝5時ごろになると、家に新聞が（　）されてくる。", opts:["移動","⽀給","伝⾔","配達"], ans:3, exp:"「配達」＝はいたつ, pengantaran.", id:"Setiap pagi sekitar jam 5, koran diantar ke rumah."},
+      {q:"誰にも⾒つからないように、書類を引き出しに（　）おいた。", opts:["かくして","さがして","なくして","はずして"], ans:0, exp:"「隠して」＝かくす, menyembunyikan.", id:"Agar tidak ditemukan siapa pun, dokumen itu saya sembunyikan di laci."},
+      {q:"あの⼦は絵の（　）がある。", opts:["全⼒","天才","才能","機能"], ans:2, exp:"「才能」＝さいのう, bakat.", id:"Anak itu memiliki bakat dalam melukis."},
+      {q:"彼の財布の中には（　）お⾦が⼊ってなかった。", opts:["すっかり","たびたび","ちっとも","ますます"], ans:2, exp:"「ちっとも〜ない」＝sama sekali (negatif).", id:"Di dalam dompetnya sama sekali tidak ada uang."},
+      {q:"⼈気歌⼿が離婚したという（　）を聞いたが、本当なのだろうか。", opts:["うそ","うわさ","ことわざ","じょうだん"], ans:1, exp:"「うわさ」＝gosip.", id:"Saya mendengar rumor bahwa penyanyi terkenal itu bercerai, tapi apakah itu benar?"},
+      {q:"探検家が新しい島を（　）した。", opts:["発⾒","発明","発展","開発"], ans:0, exp:"「発⾒」＝はっけん, penemuan.", id:"Seorang penjelajah menemukan pulau baru."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>新鮮</u>", opts:["彼らは今年⼊ってきた新鮮な社員だ","私は⾚や⻩⾊などの新鮮な⾊が好きだ","このビルは先⽉できた新鮮な建物だ","ここは海に近いので、新鮮な⿂が⾷べられます"], ans:3, exp:"「新鮮」＝しんせん, segar. ここは海に近いので、新鮮な⿂が⾷べられます。", id:"Karena dekat laut, di sini bisa makan ikan segar."},
+      {q:"<u>つなぐ</u>", opts:["⼦供たちは⼿をつないで家に帰った","先⽣とは、卒業後もずっとつないでいる","新聞や雑誌を捨てる時はつないでおく","よく話し合って、皆の意⾒をつないだ"], ans:0, exp:"「つなぐ」＝menyambung/pegangan. ⼦供たちは⼿をつないで家に帰った。", id:"Anak-anak pulang ke rumah sambil bergandengan tangan."}
+    ]}
+  ]
+},
+{
+  day: 22,
+  groups: [
+    { label: "問題1", items: [
+      {q:"あの⼆⼈はいつも⼩さいことで<u>争って</u>いる。", opts:["おこって","きそって","せまって","あらそって"], ans:3, exp:"「争って」＝あらそって, berselisih/berebut.", id:"Kedua orang itu selalu bertengkar karena hal-hal kecil."},
+      {q:"<u>地球</u>は太陽の周りを回っている。", opts:["じきゅ","ちきゅ","じきゅう","ちきゅう"], ans:3, exp:"「地球」＝ちきゅう, bumi.", id:"Bumi berputar mengelilingi matahari."},
+      {q:"彼は会議の<u>最中</u>に居眠りをしていた。", opts:["さいじゅう","さいちゅう","せいじゅう","せいちゅう"], ans:1, exp:"「最中」＝さいちゅう, di tengah-tengah.", id:"Dia tertidur sejenak di tengah rapat."}
+    ]},
+    { label: "問題2", items: [
+      {q:"この<u>電池</u>はもう使えない。", opts:["雷地","雷池","電地","電池"], ans:3, exp:"「電池」＝でんち, baterai.", id:"Baterai ini sudah tidak bisa digunakan lagi."},
+      {q:"この紙を半分に<u>おって</u>ください。", opts:["打って","折って","祈って","祝って"], ans:1, exp:"「折って」＝おって, melipat.", id:"Tolong lipat kertas ini menjadi dua."},
+      {q:"私は⼭⽥先⽣を<u>そんけい</u>しています。", opts:["尊計","尊敬","尊景","尊軽"], ans:1, exp:"「尊敬」＝そんけい, menghormati.", id:"Saya menghormati Pak/Bu Guru Yamada."}
+    ]},
+    { label: "問題3", items: [
+      {q:"この⼭には、<u>たえず</u>登⼭客が訪れている。", opts:["よく","いつも","たまに","ときどき"], ans:1, exp:"「たえず」≈「いつも」, selalu.", id:"Gunung ini selalu dikunjungi para pendaki."},
+      {q:"どうして私だけ先⽣に怒られたのか、<u>納得</u>ができない。", opts:["理由","説明","発表","理解"], ans:3, exp:"「納得」≈「理解」, mengerti/menerima.", id:"Saya tidak bisa menerima/mengerti kenapa hanya saya yang dimarahi guru."},
+      {q:"新しい映画の<u>あらすじ</u>が雑誌に書いてあった。", opts:["⼈気","感想","登場⼈物","⼤体の話"], ans:3, exp:"「あらすじ」＝ringkasan cerita ≈「⼤体の話」.", id:"Ringkasan film baru itu tertulis di majalah."},
+      {q:"働きながら⼤学に通っているなんて<u>りっぱ</u>ですね。", opts:["えらい","つよい","まじめ","たいへん"], ans:0, exp:"「りっぱ」≈「えらい」, hebat/luar biasa.", id:"Sungguh hebat bisa kuliah sambil bekerja."}
+    ]},
+    { label: "問題4", items: [
+      {q:"来⽉、学校で⽂化祭が（　）。", opts:["明かされる","開けられる","起こされる","⾏われる"], ans:3, exp:"「⾏われる」＝diadakan/diselenggarakan.", id:"Bulan depan akan diadakan festival budaya di sekolah."},
+      {q:"会議で話し合ったことを部⻑に（　）した。", opts:["報告","告⽩","予告","予報"], ans:0, exp:"「報告」＝ほうこく, laporan.", id:"Saya melaporkan kepada kepala bagian tentang hal yang dibahas dalam rapat."},
+      {q:"このコーヒーは賞味（　）が切れているから、のまないほうがいい。", opts:["期間","期限","期⽇","期待"], ans:1, exp:"「期限」＝きげん, tenggat waktu/batas waktu.", id:"Kopi ini sudah melewati tanggal kedaluwarsa, jadi sebaiknya tidak diminum."},
+      {q:"各地のニュースをお伝えしました。（　）次はスポーツです。", opts:["さて","また","しかし","それに"], ans:0, exp:"「さて」＝nah/sekarang, untuk transisi topik.", id:"Itulah berita dari berbagai daerah. Sekarang, berikutnya adalah olahraga."},
+      {q:"問題集は⾃分の（　）に合ったものを選んでください。", opts:["パート","レベル","パターン","レッスン"], ans:1, exp:"「レベル」＝level/tingkat.", id:"Silakan pilih buku soal yang sesuai dengan levelmu."},
+      {q:"窓をふいたら（　）になった。", opts:["きらきら","さらさら","つるつる","ぴかぴか"], ans:3, exp:"「ぴかぴか」＝mengkilap.", id:"Setelah dilap, jendelanya menjadi mengkilap."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>気候（きこう）</u>", opts:["この島の冬の気候はとても寒い","運動会の⽇はいい気候だった","この地⽅は⼀年中あたたかい気候で住みやすい","今年は気候が悪かった"], ans:2, exp:"「気候」＝きこう, iklim/cuaca umum. この地⽅は⼀年中あたたかい気候で住みやすい。", id:"Daerah ini beriklim hangat sepanjang tahun dan nyaman untuk ditinggali."},
+      {q:"<u>くっつく</u>", opts:["鞄にガムがくっついてとれない","だんだん⽇本語の実⼒がくっついてきた","この部屋にはエアコンがくっついている","今この商品を買うと、おまけがくっつく"], ans:0, exp:"「くっつく」＝menempel/melekat. 鞄にガムがくっついてとれない。", id:"Permen karet menempel di tas dan tidak bisa dilepas."}
+    ]}
+  ]
+},
+{
+  day: 23,
+  groups: [
+    { label: "問題1", items: [
+      {q:"⼤きな<u>岩</u>が落ちてきた。", opts:["いし","いわ","すな","はし"], ans:1, exp:"「岩」＝いわ, batu besar/karang.", id:"Batu besar jatuh dari atas."},
+      {q:"この森に様々な<u>⽣物</u>が住んでいる。", opts:["せいぶつ","せいもの","なまぶつ","なまもの"], ans:0, exp:"「⽣物」＝せいぶつ, makhluk hidup.", id:"Berbagai makhluk hidup tinggal di hutan ini."},
+      {q:"荷物をホテルに<u>預けて</u>から出かけましょう。", opts:["さけて","よけて","あずけて","とどけて"], ans:2, exp:"「預けて」＝あずける, menitipkan.", id:"Mari titipkan barang di hotel sebelum pergi keluar."}
+    ]},
+    { label: "問題2", items: [
+      {q:"警察は犯⼈を<u>おって</u>いる。", opts:["追って","送って","通って","迷って"], ans:0, exp:"「追って」＝おう, mengejar.", id:"Polisi sedang mengejar pelaku."},
+      {q:"都会にも、よく⾒ると<u>みどり</u>が沢⼭ある。", opts:["⾚","緑","録","銀"], ans:1, exp:"「緑」＝みどり, hijau.", id:"Di kota pun, kalau diperhatikan baik-baik, ada banyak ruang hijau."},
+      {q:"いつか<u>うちゅう</u>に⾏ってみたい。", opts:["宇由","宇宙","宅由","宅宙"], ans:1, exp:"「宇宙」＝うちゅう, angkasa luar.", id:"Suatu hari nanti, aku ingin mencoba pergi ke luar angkasa."}
+    ]},
+    { label: "問題3", items: [
+      {q:"<u>世の中</u>にはいろいろな考え⽅の⼈がいる。", opts:["社会","全国","世界中","この時代"], ans:0, exp:"「世の中」≈「社会」, masyarakat.", id:"Di dunia ini ada orang dengan berbagai macam cara berpikir."},
+      {q:"気分が悪くなって、途中で<u>下⾞した</u>。", opts:["帰った","乗った","降りた","⽌まった"], ans:2, exp:"「下⾞した」≈「降りた」, turun.", id:"Saya merasa tidak enak badan lalu turun di tengah perjalanan."},
+      {q:"このびんは<u>再利⽤</u>されるので、よく洗ってから捨ててください。", opts:["サークル","リサーチ","リサイクル","サイクリング"], ans:2, exp:"「再利⽤」≈「リサイクル」, daur ulang.", id:"Botol ini akan digunakan kembali, jadi tolong cuci dengan baik sebelum membuangnya."},
+      {q:"<u>おまちどおさま</u>。さあ、⾏きましょう。", opts:["おじゃましました","おまたせしました","しつれいしました","おせわになりました"], ans:1, exp:"「おまちどおさま」≈「おまたせしました」, maaf menunggu lama.", id:"Maaf sudah menunggu lama. Baik, mari kita berangkat."}
+    ]},
+    { label: "問題4", items: [
+      {q:"⼯場の⽕事で近く住⺠も（　）を受けた。", opts:["困難","⾮難","公害","被害"], ans:3, exp:"「被害」＝ひがい, kerugian.", id:"Akibat kebakaran pabrik, penduduk sekitar juga mengalami kerugian."},
+      {q:"この箱の（　）は何だろう。", opts:["中⾝","中間","内容","真ん中"], ans:0, exp:"「中⾝」＝なかみ, isi.", id:"Isi kotak ini ya apa, ya?"},
+      {q:"⽫は5枚ずつ（　）、棚にしまってください。", opts:["あげて","のせて","かさねて","たたんで"], ans:2, exp:"「重ねて」＝かさねる, menumpuk.", id:"Tolong susun piring masing-masing 5 buah lalu simpan di rak."},
+      {q:"⽬標は10分だったが、（　）は15分もかかった。", opts:["実際","真実","現実","直接"], ans:0, exp:"「実際」＝じっさい, kenyataan/sebenarnya.", id:"Targetnya 10 menit, tetapi kenyataannya sampai 15 menit."},
+      {q:"プールに（　）はいけません。", opts:["落ちこんで","取りこんで","⾶びこんで","⼊りこんで"], ans:2, exp:"「⾶び込んで」＝melompat masuk.", id:"Tidak boleh melompat ke dalam kolam renang."},
+      {q:"さくらちゃんは、うちの娘の⼀番の（　）だ。", opts:["仲良し","親せき","同い年","知り合い"], ans:0, exp:"「仲良し」＝なかよし, akrab/sahabat baik.", id:"Sakura-chan adalah sahabat paling dekat anak perempuan saya."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>それとも</u>", opts:["会議は⽊曜⽇、それとも⾦曜⽇です","⾷後のお飲み物はコーヒー、それともお茶はいかがですか","夏休みには海に⾏きますか、それとも⼭に⾏きますか","すみません。10分それとも待ってください"], ans:2, exp:"「それとも」＝atau (antara dua pilihan). 夏休みには海に⾏きますか、それとも⼭に⾏きますか。", id:"Saat liburan musim panas, akan pergi ke laut atau ke gunung?"},
+      {q:"<u>不合格</u>", opts:["10⼈試験をうけて3⼈不合格だった","不合格をもらって、とても嬉しい","⼀番⾏きたかった⼤学は不合格だった","⼀⽣懸命勉強したが、不合格に合格した"], ans:2, exp:"「不合格」＝ふごうかく, tidak lulus/gagal ujian. ⼀番⾏きたかった⼤学は不合格だった。", id:"Universitas yang paling ingin saya masuki ternyata tidak lulus."}
+    ]}
+  ]
+},
+{
+  day: 24,
+  groups: [
+    { label: "問題1", items: [
+      {q:"そのゲーム会社の昨年の売り上げは、2<u>兆</u>円だったそうだ。", opts:["しょう","じょう","ちょう","ちゅう"], ans:2, exp:"「兆」＝ちょう, triliun.", id:"Katanya, penjualan perusahaan game itu tahun lalu mencapai 2 triliun yen."},
+      {q:"彼⼥が新しい社⻑の<u>秘書</u>です。", opts:["ひしょ","ひじょ","ひいしょ","ひしょう"], ans:0, exp:"「秘書」＝ひしょ, sekretaris.", id:"Dia adalah sekretaris presiden direktur yang baru."},
+      {q:"試合に負けて<u>悔しい</u>。", opts:["かなしい","くやしい","くわしい","さびしい"], ans:1, exp:"「悔しい」＝くやしい, menyesal/kesal.", id:"Kalah dalam pertandingan rasanya sangat menyesakkan/menyakitkan."}
+    ]},
+    { label: "問題2", items: [
+      {q:"空には<u>くも</u>ひとつなく、いい天気だ。", opts:["雪","雷","雲","霧"], ans:2, exp:"「雲」＝くも, awan.", id:"Langit cerah tanpa satu pun awan, cuacanya bagus."},
+      {q:"本⽇は、ご<u>しょうたい</u>ありがとうございます。", opts:["遅滞","招待","紹持","紹待"], ans:1, exp:"「招待」＝しょうたい, undangan.", id:"Terima kasih atas undangannya hari ini."},
+      {q:"図書館のカードを<u>しんせい</u>した。", opts:["申請","信請","真請","親請"], ans:0, exp:"「申請」＝しんせい, permohonan resmi.", id:"Saya mengajukan pembuatan kartu perpustakaan."}
+    ]},
+    { label: "問題3", items: [
+      {q:"両国の関係が<u>かいぜん</u>された。", opts:["かわった","つくられた","なくなった","よくなった"], ans:3, exp:"「改善された」＝menjadi lebih baik.", id:"Hubungan kedua negara itu telah membaik."},
+      {q:"隣の家はいつも<u>そうぞうしい</u>。", opts:["暗い","うるさい","静かすぎる","楽しそうだ"], ans:1, exp:"「騒々しい」＝そうぞうしい, berisik.", id:"Rumah sebelah selalu berisik."},
+      {q:"会社は社員全員に1万円ずつ<u>⽀給</u>した。", opts:["貸した","集めた","払った","貯⾦した"], ans:2, exp:"「⽀給」≈「払った」, memberikan/membayar.", id:"Perusahaan memberikan masing-masing 10.000 yen kepada seluruh karyawan."},
+      {q:"この中で⼀番<u>もてる</u>のは彼だろう。", opts:["頭がいい","⼒がある","お⾦がある","⼈気がある"], ans:3, exp:"「もてる」≈「⼈気がある」, populer.", id:"Di antara mereka, sepertinya dialah yang paling populer."}
+    ]},
+    { label: "問題4", items: [
+      {q:"安いと思ってたくさん買ったら、合計（　）を⾒てびっくりした。", opts:["定価","全額","物価","値段"], ans:1, exp:"「全額」＝ぜんがく, jumlah penuh.", id:"Saya kira murah lalu membeli banyak, tapi kaget saat melihat total harganya."},
+      {q:"⼭に⾏ったら、たくさん⾍に（　）しまった。", opts:["かかって","さされて","つかれて","とられて"], ans:1, exp:"「刺されて」＝さされる, disengat.", id:"Saat pergi ke gunung, saya tergigit banyak serangga."},
+      {q:"卒業したら何をするべきか、ずっと（　）いる。", opts:["覚えて","感じて","悩んで","祈って"], ans:2, exp:"「悩んで」＝なやむ, khawatir/galau.", id:"Saya terus memikirkan apa yang seharusnya dilakukan setelah lulus."},
+      {q:"悪い病気の（　）があるので、すぐに検査したほうがいいと医者に⾔われた。", opts:["疑い","迷い","疑問","迷惑"], ans:0, exp:"「疑い」＝うたがい, keraguan/kecurigaan.", id:"Dokter mengatakan karena ada dugaan penyakit serius, sebaiknya segera menjalani pemeriksaan."},
+      {q:"10を3で割ると、（　）は1だ。", opts:["あまり","おつり","のこり","はかり"], ans:0, exp:"「あまり」＝sisa hasil pembagian.", id:"Jika 10 dibagi 3, sisanya adalah 1."},
+      {q:"⼀⽇中歩いたので、もう疲れて（　）です。", opts:["ぴりぴり","ひりひり","ぺらぺら","へとへと"], ans:3, exp:"「へとへと」＝sangat lelah.", id:"Karena berjalan seharian, saya benar-benar kelelahan."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>発明</u>", opts:["電話を発明したのは誰か、知っていますか","新しい星を発明した","A社の若い社員によって発明された規則","⼈気作家の新しい⼩説を発明した"], ans:0, exp:"「発明」＝はつめい, penemuan. 電話を発明したのは誰か、知っていますか。", id:"Apakah kamu tahu siapa yang menemukan telepon?"},
+      {q:"<u>そろえる</u>", opts:["⽞関で脱いだ靴をそろえた","いらない物をそろえて捨てた","腕時計をはずして、テーブルにそろえた","お客さんが来る前に、部屋をそろえた"], ans:0, exp:"「そろえる」＝merapikan/menyamakan. ⽞関で脱いだ靴をそろえた。", id:"Saya merapikan sepatu yang dilepas di pintu masuk."}
+    ]}
+  ]
+},
+{
+  day: 25,
+  groups: [
+    { label: "問題1", items: [
+      {q:"このデパートは、地下に<u>有料</u>駐⾞場がある。", opts:["うりょ","うりょう","ゆうりょ","ゆうりょう"], ans:3, exp:"「有料」＝ゆうりょう, berbayar.", id:"Department store ini memiliki tempat parkir berbayar di lantai bawah tanah."},
+      {q:"プレゼント⽤に<u>包んで</u>ください。", opts:["かこんで","すすんで","つかんで","つつんで"], ans:3, exp:"「包んで」＝つつむ, membungkus.", id:"Tolong bungkuskan sebagai hadiah."},
+      {q:"タバコを吸わないという<u>条件</u>で、この部屋を借りている。", opts:["じょけん","じょげん","じょうけん","じょうげん"], ans:2, exp:"「条件」＝じょうけん, syarat.", id:"Saya menyewa kamar ini dengan syarat tidak merokok."}
+    ]},
+    { label: "問題2", items: [
+      {q:"⽗は30年同じ会社に<u>つとめて</u>います。", opts:["勤めて","勧めて","難めて","務めて"], ans:0, exp:"「勤めて」＝つとめる, bekerja (di perusahaan).", id:"Ayah saya telah bekerja di perusahaan yang sama selama 30 tahun."},
+      {q:"⽕事のときは、ここから<u>にげて</u>ください。", opts:["巡げて","逃げて","退げて","避げて"], ans:1, exp:"「逃げて」＝にげる, lari/kabur.", id:"Jika terjadi kebakaran, silakan melarikan diri dari sini."},
+      {q:"彼の<u>けってん</u>は、⼈の話をよく聞かないところだ。", opts:["⽋点","失","失点","決点"], ans:0, exp:"「⽋点」＝けってん, kekurangan.", id:"Kelemahannya adalah ia tidak mau mendengarkan orang lain dengan baik."}
+    ]},
+    { label: "問題3", items: [
+      {q:"彼⼥の話を聞いて、<u>おおよそ</u>のことがわかりました。", opts:["少しの","くわしい","だいたいの","半分くらいの"], ans:2, exp:"「おおよそ」≈「だいたいの」, kurang lebih.", id:"Setelah mendengar ceritanya, saya kurang lebih memahaminya."},
+      {q:"あとは⾊をぬったら、<u>できあがり</u>です。", opts:["出発","発売","完成","最⾼"], ans:2, exp:"「できあがり」≈「完成」, selesai.", id:"Tinggal mewarnai saja, lalu selesai."},
+      {q:"⼿紙には<u>感謝</u>の⾔葉が書かれていた。", opts:["おだいじに","ありがとう","さようなら","ごめんなさい"], ans:1, exp:"「感謝」≈「ありがとう」, terima kasih.", id:"Di dalam surat itu tertulis kata-kata ucapan terima kasih."},
+      {q:"もうすぐ発表ですね。<u>リラックス</u>してください。", opts:["笑って","楽しんで","怒らないで","緊張しないで"], ans:3, exp:"「リラックス」≈「緊張しないで」, jangan gugup.", id:"Sebentar lagi pengumuman ya. Silakan rileks."}
+    ]},
+    { label: "問題4", items: [
+      {q:"銀⾏の（　）には、3000円しか⼊っていなかった。", opts:["⼝座","貯⾦","財産","窓⼝"], ans:0, exp:"「⼝座」＝こうざ, rekening/akun.", id:"Di rekening bank hanya ada 3.000 yen."},
+      {q:"家に帰ったら、ご飯を（　）おいてください。", opts:["たいて","たてて","ゆでて","わかして"], ans:0, exp:"「炊いて」＝たく, menanak/memasak nasi.", id:"Kalau sudah sampai di rumah, tolong masakkan nasi ya."},
+      {q:"⼦どもが川で（　）のに気づいて、すぐに助けに向かった。", opts:["おちている","おぼれている","しずんでいる","ながれている"], ans:1, exp:"「溺れている」＝おぼれる, tenggelam (orang).", id:"Menyadari ada anak yang tenggelam di sungai, saya segera pergi menolong."},
+      {q:"引っ越しの（　）はいくらぐらいかかりますか。", opts:["現⾦","家賃","費⽤","利⽤"], ans:2, exp:"「費⽤」＝ひよう, biaya.", id:"Kira-kira berapa biaya pindah rumah?"},
+      {q:"彼の顔は（　）だったから、その話はきっと本当だろう。", opts:["真剣","真実","しっかり","まっすぐ"], ans:0, exp:"「真剣」＝しんけん, sungguh-sungguh/serius.", id:"Karena wajahnya serius, cerita itu pasti benar."},
+      {q:"A：具合はいかがですか。 B：（　）で、すっかりよくなりました。", opts:["おかげさま","おせわさま","ごくろうさま","ごちそうさま"], ans:0, exp:"「おかげさまで」＝berkat perhatian Anda.", id:"A: Bagaimana keadaanmu? B: Berkat perhatianmu, saya sudah sembuh total."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>今後</u>", opts:["今後の夏休みには、国へ帰る","部⻑は今後⽊曜⽇まで出張だ","今後は、ごみの再利⽤がますます進むだろう","⼤学に合格した今後は遊ぶ"], ans:2, exp:"「今後」＝こんご, ke depannya. 今後は、ごみの再利⽤がますます進むだろう。", id:"Ke depannya, daur ulang sampah akan semakin berkembang."},
+      {q:"<u>ユーモア</u>", opts:["⼈前でユーモアをする","私はユーモアが⼤きい","先⽣の話はいつもユーモアがあっておもしろい","その男の⼦はとてもユーモアだ"], ans:2, exp:"「ユーモア」＝humor. 先⽣の話はいつもユーモアがあっておもしろい。", id:"Cerita guru itu selalu penuh humor dan menarik."}
+    ]}
+  ]
+},
+{
+  day: 26,
+  groups: [
+    { label: "問題1", items: [
+      {q:"息⼦は絵や⾳楽などの<u>芸術</u>に関⼼があるようだ。", opts:["げいじつ","げいしゅつ","げいじゅつ","げいちゅつ"], ans:2, exp:"「芸術」＝げいじゅつ, seni.", id:"Anak laki-laki saya tampaknya tertarik pada seni seperti lukisan dan musik."},
+      {q:"この映画は<u>近⽇</u>公開されます。", opts:["きんび","ちかび","きんじつ","ちかじつ"], ans:2, exp:"「近⽇」＝きんじつ, dalam waktu dekat.", id:"Film ini akan segera dirilis dalam waktu dekat."},
+      {q:"この信号を<u>渡って</u>まっすぐ⾏くと、駅があります。", opts:["とおって","まがって","もどって","わたって"], ans:3, exp:"「渡って」＝わたる, menyeberang.", id:"Jika menyeberang lampu lalu lintas ini dan berjalan lurus, akan ada stasiun."}
+    ]},
+    { label: "問題2", items: [
+      {q:"⼤学で<u>ほうりつ</u>について学びたい。", opts:["⽅⽴","⽅律","法⽴","法律"], ans:3, exp:"「法律」＝ほうりつ, hukum.", id:"Saya ingin belajar tentang hukum di universitas."},
+      {q:"靴はここで<u>ぬいで</u>ください。", opts:["悦いで","税いで","脱いで","説いで"], ans:2, exp:"「脱いで」＝ぬぐ, melepas (sepatu/pakaian).", id:"Silakan lepaskan sepatu di sini."},
+      {q:"<u>とうろく</u>をする⽅は、こちらにお名前をご記⼊ください。", opts:["登緑","登録","発緑","発録"], ans:1, exp:"「登録」＝とうろく, pendaftaran.", id:"Bagi yang ingin mendaftar, silakan tuliskan nama Anda di sini."}
+    ]},
+    { label: "問題3", items: [
+      {q:"来週の飲み会に<u>出る</u>⼈は全部で何⼈ですか。", opts:["⼊会する","出場する","参加する","⽋席する"], ans:2, exp:"「出る」≈「参加する」, berpartisipasi.", id:"Total berapa orang yang akan ikut acara minum-minum minggu depan?"},
+      {q:"去年の<u>くれ</u>に出産しました。", opts:["1⽉ごろ","4⽉ごろ","7⽉ごろ","12⽉ごろ"], ans:3, exp:"「くれ」＝akhir tahun.", id:"Saya melahirkan pada akhir tahun lalu."},
+      {q:"彼は事実を<u>かたって</u>いると思う。", opts:["⾔っている","聞いている","知っている","かくしている"], ans:0, exp:"「かたる」≈「⾔っている」, menyatakan/menceritakan.", id:"Saya pikir dia mengatakan fakta yang sebenarnya."},
+      {q:"困っている⼈を助けるのは<u>当たり前</u>のことだ。", opts:["普通の","親切な","特別な","難しい"], ans:0, exp:"「当たり前」＝あたりまえ, hal yang wajar/biasa.", id:"Menolong orang yang kesusahan adalah hal yang wajar."}
+    ]},
+    { label: "問題4", items: [
+      {q:"この⽂章を（　）ごとにまとめなさい。", opts:["段差","段落","階段","段々"], ans:1, exp:"「段落」＝だんらく, paragraf.", id:"Ringkaslah teks ini per paragraf."},
+      {q:"こちらの部屋は会員（　）なので、会員でない⽅はご遠慮ください。", opts:["専⾨","専⽤","固有","固定"], ans:1, exp:"「専⽤」＝せんよう, khusus untuk.", id:"Ruangan ini khusus untuk anggota, jadi yang bukan anggota dimohon tidak masuk."},
+      {q:"ここは駐⾞（　）です。⾞を⽌めないでください。", opts:["中⽌","防⽌","停⽌","禁⽌"], ans:3, exp:"「禁⽌」＝きんし, larangan.", id:"Di sini dilarang parkir. Tolong jangan menghentikan mobil."},
+      {q:"貯⾦がほとんどなく、⽣活が（　）。", opts:["さむい","にがい","くるしい","さびしい"], ans:2, exp:"「苦しい」＝くるしい, susah.", id:"Tabungan hampir tidak ada, sehingga hidup terasa sulit."},
+      {q:"このグラスは割れやすいので、（　）おいてください。", opts:["さっと","じっと","そっと","ぱっと"], ans:2, exp:"「そっと」＝perlahan.", id:"Gelas ini mudah pecah, jadi tolong letakkan dengan pelan."},
+      {q:"私は卵（　）で、卵を⾷べると体がかゆくなる。", opts:["ショック","アレルギー","エネルギー","リアクション"], ans:1, exp:"「アレルギー」＝alergi.", id:"Saya alergi telur, jadi jika makan telur tubuh saya menjadi gatal."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>済む（すむ）</u>", opts:["この検査が済んだら、となりの部屋に来てください","⾬は昼になったら済むだろう","このニュース番組は12時に済む","会社が済んだあとで映画を⾒た"], ans:0, exp:"「済む」＝selesai/berakhir. この検査が済んだら、となりの部屋に来てください。", id:"Setelah pemeriksaan ini selesai, silakan datang ke ruangan sebelah."},
+      {q:"<u>差別（さべつ）</u>", opts:["同じ箱に⼊れたら、塩と砂糖を差別した","燃えるゴミと燃えないゴミを差別する","同じ仕事をしているのに、他の⼈より給料が安いのは差別だ","この中から汚れた商品を差別する"], ans:2, exp:"「差別」＝さべつ, diskriminasi. 同じ仕事をしているのに、他の⼈より給料が安いのは差別だ。", id:"Melakukan pekerjaan yang sama tetapi digaji lebih rendah dari orang lain adalah diskriminasi."}
+    ]}
+  ]
+},
+{
+  day: 27,
+  groups: [
+    { label: "問題1", items: [
+      {q:"そのたこ焼き店は、駅から<u>徒歩</u>1分のところにあります。", opts:["とほ","とぼ","とうほ","とうぼ"], ans:0, exp:"「徒歩」＝とほ, berjalan kaki.", id:"Toko takoyaki itu terletak satu menit berjalan kaki dari stasiun."},
+      {q:"<u>知⼈</u>にいい病院を紹介してもらった。", opts:["しじん","しにん","ちじん","ちにん"], ans:2, exp:"「知⼈」＝ちじん, kenalan.", id:"Saya diperkenalkan rumah sakit yang bagus oleh seorang kenalan."},
+      {q:"作⽂の<u>下書き</u>はもう終わっています。", opts:["かがき","げがき","したがき","しもがき"], ans:2, exp:"「下書き」＝したがき, draf tulisan kasar.", id:"Draf karangan sudah selesai."}
+    ]},
+    { label: "問題2", items: [
+      {q:"店の前には、<u>おおぜい</u>の⼈が並んでいた。", opts:["⼤努","⼤勢","多努","多勢"], ans:1, exp:"「⼤勢」＝おおぜい, banyak orang.", id:"Banyak orang berbaris di depan toko."},
+      {q:"<u>しゅじゅつ</u>は無事に成功した。", opts:["主述","主術","⼿述","⼿術"], ans:3, exp:"「⼿術」＝しゅじゅつ, operasi.", id:"Operasinya berhasil dengan selamat."},
+      {q:"⽇本はいろいろな国と<u>ぼうえき</u>をしている。", opts:["貨易","貨湯","貿易","貿湯"], ans:2, exp:"「貿易」＝ぼうえき, perdagangan luar negeri.", id:"Jepang melakukan perdagangan dengan berbagai negara."}
+    ]},
+    { label: "問題3", items: [
+      {q:"明⽇の<u>きしょう</u>時間は何時ですか。", opts:["寝る","起きる","⾷事する","出かける"], ans:1, exp:"「起床」＝きしょう, bangun tidur.", id:"Jam berapa waktu bangun besok?"},
+      {q:"そのとき、私を<u>すくって</u>くれたのが佐々⽊さんです。", opts:["さそって","助けて","⾒つけて","連れていって"], ans:1, exp:"「救う」≈「助けて」, menolong.", id:"Pada saat itu, orang yang menolong saya adalah Sasaki-san."},
+      {q:"<u>くさった</u>⿂を⾷べてしまった。", opts:["⽣の","焼きすぎた","悪くなった","料理していない"], ans:2, exp:"「腐った」≈「悪くなった」, busuk.", id:"Saya terlanjur memakan ikan yang sudah busuk."},
+      {q:"彼⼥に<u>プロポーズ</u>した。", opts:["結婚した","付き合った","好きと⾔った","結婚を申し込んだ"], ans:3, exp:"「プロポーズ」≈「結婚を申し込んだ」, melamar.", id:"Saya melamar dia."}
+    ]},
+    { label: "問題4", items: [
+      {q:"18時15分（　）の⾶⾏機に乗った。", opts:["⾏","便","出","発"], ans:1, exp:"「便」＝びん, nomor penerbangan.", id:"Saya naik pesawat penerbangan pukul 18.15."},
+      {q:"昨⽇の⼤⾬で、桜の花が（　）しまった。", opts:["枯れて","散って","降って","取れて"], ans:1, exp:"「散って」＝ちる, gugur.", id:"Karena hujan deras kemarin, bunga sakura berguguran."},
+      {q:"店の⼈は本物のダイヤモンドだと⾔ったが、こんなに安いと（　）できない。", opts:["感⼼","⼼配","信⽤","⽤⼼"], ans:2, exp:"「信⽤」＝しんよう, percaya.", id:"Penjaga toko bilang itu berlian asli, tapi dengan harga semurah ini saya tidak bisa percaya."},
+      {q:"彼⼥はおとなしくて、クラスであまり⽬⽴たない（　）だ。", opts:["在学","実体","存在","状態"], ans:2, exp:"「存在」＝そんざい, eksistensi/keberadaan.", id:"Dia pendiam dan tidak terlalu menonjol di kelas."},
+      {q:"銀⾏で家賃を（　）。", opts:["取り⼊れた","取り込んだ","振りかけた","振り込んだ"], ans:3, exp:"「振り込んだ」＝ふりこむ, transfer uang.", id:"Saya mentransfer uang sewa lewat bank."},
+      {q:"⾷事代は（　）にしましょう。⼀⼈２５００円です。", opts:["わりかん","わりこみ","わりざん","わりびき"], ans:0, exp:"「割り勘」＝わりかん, bayar masing-masing.", id:"Mari kita bagi rata biaya makan. Per orang 2.500 yen."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>ごろごろ</u>", opts:["休みの⽇は、⼀⽇部屋でごろごろしている","彼⼥は私の前をごろごろ⾏った","私の前に並んでいる⼈がごろごろして、列がぜんぜん進まない","突然のことに、どうすればいいかごろごろした"], ans:0, exp:"「ごろごろ」＝bermalas-malasan. 休みの⽇は、⼀⽇部屋でごろごろしている。", id:"Orang-orang di depan saya bergerak lambat sekali, sehingga antrean tidak maju sama sekali."},
+      {q:"<u>イメージ</u>", opts:["今⽇の私のドレスのイメージはどうですか","新しい企画のイメージを来週決める","⽇本に対して、どんなイメージがありますか","あの店にもう⼀度⾏きたいイメージがある"], ans:2, exp:"「イメージ」＝gambaran/kesan. ⽇本に対して、どんなイメージがありますか。", id:"Bagaimana kesan gaun yang saya pakai hari ini?"}
+    ]}
+  ]
+},
+{
+  day: 28,
+  groups: [
+    { label: "問題1", items: [
+      {q:"話している間に、コーヒーが<u>冷めて</u>しまった。", opts:["きめて","さめて","しめて","つめて"], ans:1, exp:"「冷めて」＝さめる, menjadi dingin.", id:"Saat sedang berbicara, kopi saya keburu menjadi dingin."},
+      {q:"この<u>作業</u>はすぐに終わります。", opts:["さぎょ","さぎょう","さくぎょ","さくぎょう"], ans:1, exp:"「作業」＝さぎょう, pekerjaan/tugas.", id:"Pekerjaan ini akan segera selesai."},
+      {q:"この部屋では、<u>⽂房具</u>も売っている。", opts:["ぶんほぐ","ぶんぼぐ","ぶんほうぐ","ぶんぼうぐ"], ans:3, exp:"「⽂房具」＝ぶんぼうぐ, alat tulis kantor.", id:"Di ruangan ini juga dijual alat tulis."}
+    ]},
+    { label: "問題2", items: [
+      {q:"⾜を<u>こっせつ</u>して⼊院した。", opts:["⾻切","⾻折","⾻接","⾻節"], ans:1, exp:"「⾻折」＝こっせつ, patah tulang.", id:"Saya patah kaki dan harus dirawat di rumah sakit."},
+      {q:"あの⼈は<u>たにん</u>です。私とは関係ありません。", opts:["多⼈","代⼈","他⼈","外⼈"], ans:2, exp:"「他⼈」＝たにん, orang lain.", id:"Orang itu orang lain. Tidak ada hubungannya dengan saya."},
+      {q:"仕事に⼀⽣懸命なのはいいが、<u>きゅうそく</u>も必要だ。", opts:["休⾜","休速","休息","休則"], ans:2, exp:"「休息」＝きゅうそく, istirahat.", id:"Bekerja dengan sungguh-sungguh itu baik, tetapi istirahat juga perlu."}
+    ]},
+    { label: "問題3", items: [
+      {q:"祖⺟はペットの猫をとても<u>かわいがって</u>いる。", opts:["⼤事にしている","⻑く飼っている","かわいいと思っている","かわいそうだと思って"], ans:0, exp:"「かわいがる」≈「⼤事にしている」, menjaga dengan baik.", id:"Nenek sangat menyayangi kucing peliharaannya."},
+      {q:"もっと<u>シンプル</u>なデザインのものはありませんか。", opts:["単純な","複雑な","変わった","おもしろい"], ans:0, exp:"「シンプル」≈「単純な」, sederhana.", id:"Apakah tidak ada yang desainnya lebih sederhana?"},
+      {q:"予定どおり、すべて<u>うまくいった</u>。", opts:["⾏動した","成功した","⾷べられた","おいしくなった"], ans:1, exp:"「うまくいった」≈「成功した」, berhasil.", id:"Sesuai rencana, semuanya berjalan lancar."},
+      {q:"⾼速道路で<u>のろのろ</u>運転するのは危ない。", opts:["はやく","へたに","ゆれて","ゆっくり"], ans:3, exp:"「のろのろ」≈「ゆっくり」, lambat-lambat.", id:"Mengemudi dengan lambat di jalan tol itu berbahaya."}
+    ]},
+    { label: "問題4", items: [
+      {q:"新しい⾸相が記者（　）を⾏った。", opts:["会⾒","交際","社交","⾯会"], ans:0, exp:"「記者会⾒」＝きしゃかいけん, konferensi pers.", id:"Perdana menteri baru mengadakan konferensi pers."},
+      {q:"友達を（　）映画を⾒に⾏った。", opts:["さそって","さわって","出会って","付き合って"], ans:0, exp:"「誘って」＝さそう, mengajak.", id:"Saya mengajak teman dan pergi menonton film."},
+      {q:"泣きながら（　）弟を⻭医者へ。", opts:["いたい","つらい","いやがる","ほしがる"], ans:2, exp:"「嫌がる」＝いやがる, menolak dengan tidak suka.", id:"Sambil menangis dan menolak, adik saya dibawa ke dokter gigi."},
+      {q:"⼊会の（　）は⽉末までにしてください。", opts:["⽅法","⼿伝い","⼿続き","やり⽅"], ans:2, exp:"「⼿続き」＝てつづき, prosedur pendaftaran.", id:"Silakan selesaikan prosedur pendaftaran keanggotaan sebelum akhir bulan."},
+      {q:"この公園は、桜の（　）として知られている。", opts:["⾒物","名所","有名","名物"], ans:1, exp:"「名所」＝めいしょ, tempat terkenal.", id:"Taman ini terkenal sebagai tempat terkenal dengan bunga sakura."},
+      {q:"A：もう⼀杯、コーヒーの（　）はいかがですか。 B：いいえ、もうけっこうです。", opts:["かえり","かわり","おかえり","おかわり"], ans:3, exp:"「おかわり」＝tambahan.", id:"A: Mau secangkir kopi lagi? B: Tidak, terima kasih, sudah cukup."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>くわしい</u>", opts:["そんなくわしいことは知らない","彼はコンピューターにくわしくて、なんでも知っている","友⼈があつまってくわしい話をした","この本はページも多いし、くわしい"], ans:1, exp:"「くわしい」＝detail/mendalam. 彼はコンピューターにくわしくて、なんでも知っている。", id:"Dia sangat paham komputer dan tahu banyak hal."},
+      {q:"<u>組み⽴てる</u>", opts:["本棚をきれいに組み⽴てた","それでは、⼆⼈ずつ組み⽴ててください","この棚は安いが、かったあと⾃分で組み⽴てなければならない","今はマンションに住んでいて組み⽴てた"], ans:2, exp:"「組み⽴てる」＝merakit. この棚は安いが、かったあと⾃分で組み⽴てなければならない。", id:"Rak ini murah, tetapi setelah membeli harus dirakit sendiri."}
+    ]}
+  ]
+},
+{
+  day: 29,
+  groups: [
+    { label: "問題1", items: [
+      {q:"このページは読者からの<u>投書</u>で作られている。", opts:["としょ","とうしょ","としょう","とうしょう"], ans:1, exp:"「投書」＝とうしょ, surat pembaca.", id:"Halaman ini dibuat dari kiriman tulisan para pembaca."},
+      {q:"来週、<u>選挙</u>が⾏われる。", opts:["せんきょ","せんぎょ","せんきょう","せんぎょう"], ans:0, exp:"「選挙」＝せんきょ, pemilu.", id:"Minggu depan akan diadakan pemilihan umum."},
+      {q:"⽇本の<u>⾸都</u>は東京です。", opts:["しゅと","しゅうと","しゅとう","しゅうとう"], ans:0, exp:"「⾸都」＝しゅと, ibu kota.", id:"Ibu kota Jepang adalah Tokyo."}
+    ]},
+    { label: "問題2", items: [
+      {q:"あの⼥性はとても若く⾒えるが、実はもうお<u>まご</u>さんがいるそうだ。", opts:["係","孫","独","採"], ans:1, exp:"「孫」＝まご, cucu.", id:"Perempuan itu terlihat sangat muda, tetapi katanya sebenarnya sudah punya cucu."},
+      {q:"台⾵で⼤きな⽊が<u>たおれた</u>。", opts:["到れた","倒れた","頃れた","傾れた"], ans:1, exp:"「倒れた」＝たおれる, tumbang/runtuh.", id:"Sebuah pohon besar tumbang akibat topan."},
+      {q:"⼊院していた⺟が、昨⽇やっと<u>たいいん</u>した。", opts:["返院","追院","遅院","退院"], ans:3, exp:"「退院」＝たいいん, keluar rumah sakit.", id:"Ibu yang dirawat di rumah sakit akhirnya kemarin keluar dari rumah sakit."}
+    ]},
+    { label: "問題3", items: [
+      {q:"⼆つのグループが、<u>合同</u>で研究発表をした。", opts:["⼀緒に","上⼿に","特別な","同じ"], ans:0, exp:"「合同」≈「⼀緒に」, bersama-sama.", id:"Dua kelompok melakukan presentasi penelitian bersama."},
+      {q:"私は<u>なま</u>の⿂が好きだ。", opts:["古い","新鮮な","やわらかい","そのままの"], ans:3, exp:"「⽣」≈「そのままの」, mentah.", id:"Saya suka ikan mentah."},
+      {q:"佐藤さんとは、いつもメールで<u>やりとり</u>しています。", opts:["質問して","相談して","けんかして","連絡をとって"], ans:3, exp:"「やりとり」≈「連絡をとって」, berkomunikasi.", id:"Saya selalu berkomunikasi dengan Pak Sato lewat email."},
+      {q:"リンゴを三つ買ったら、店の⼈も⼀つ<u>サービス</u>してくれた。", opts:["ただで","安くして","すすめて","とりかえて"], ans:0, exp:"「サービス」≈「ただで」, gratis (tambahan).", id:"Saat saya membeli tiga apel, pegawai toko memberi satu tambahan gratis."}
+    ]},
+    { label: "問題4", items: [
+      {q:"まだ来ていないのは、吉⽥さんだけですね。全員（　）まで、待ちましょう。", opts:["そろう","とどく","つかまる","まとまる"], ans:0, exp:"「揃う」＝そろう, lengkap/berkumpul.", id:"Yang belum datang tinggal Pak Yoshida saja ya. Mari kita tunggu sampai semua berkumpul."},
+      {q:"この席は7⼈⽤なので、もっと（　）座ってください。", opts:["おして","ついて","つめて","おさえて"], ans:2, exp:"「詰めて」＝つめる, mengisi/memadatkan.", id:"Tempat duduk ini untuk tujuh orang, jadi silakan duduk lebih rapat."},
+      {q:"いくらカレーが好きでも、毎⽇⾷べると（　）。", opts:["あきる","あける","あきれる","あらためる"], ans:0, exp:"「飽きる」＝あきる, bosan/jenuh.", id:"Walaupun sangat suka kari, kalau dimakan setiap hari pasti bosan."},
+      {q:"⻑年この国に住んでいるので、今ではここが第⼆の（　）のようだ。", opts:["⽥舎","帰国","故郷","実家"], ans:2, exp:"「故郷」＝こきょう, kampung halaman.", id:"Karena sudah lama tinggal di negara ini, sekarang rasanya seperti kampung halaman kedua."},
+      {q:"⾃分が失敗した理由を、⼈の（　）にしてはいけない。", opts:["こと","せい","ため","わけ"], ans:1, exp:"「せい」＝sebab/gara-gara (konotasi negatif).", id:"Jangan menyalahkan orang lain atas alasan kegagalan diri sendiri."},
+      {q:"（　）⾏かない予定だったが、⾏かなければならなくなった。", opts:["そろそろ","だんだん","まあまあ","もともと"], ans:3, exp:"「もともと」＝sejak awal.", id:"Awalnya memang tidak berencana pergi, tetapi akhirnya harus pergi."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>平気</u>", opts:["⼀晩ぐらい寝なくても、平気です","この地⽅は気候が平気だ","地震の時は平気に⾏動すべきだ","あの⼈はあまり笑わない、平気な⼈だ"], ans:0, exp:"「平気」＝へいき, tenang/tidak masalah/tidak peduli. ⼀晩ぐらい寝なくても、平気です。", id:"Tidak tidur semalaman pun tidak apa-apa."},
+      {q:"<u>述べる</u>", opts:["彼はスピーチで、家族への感謝の気持ちを述べた","友⼈とお茶を飲みながら述べた","図書館で⼦どもたちに本を述べた","隣の家の⼦は、毎朝必ず述べる"], ans:0, exp:"「述べる」＝menyatakan/mengungkapkan. 彼はスピーチで、家族への感謝の気持ちを述べた。", id:"Dalam pidatonya, dia menyampaikan rasa terima kasih kepada keluarganya."}
+    ]}
+  ]
+},
+{
+  day: 30,
+  groups: [
+    { label: "問題1", items: [
+      {q:"この本を読んで、今までの⽣活を<u>改めよう</u>と思った。", opts:["やめよう","あきらめよう","あたためよう","あらためよう"], ans:3, exp:"「改める」＝あらためる, memperbaiki/mengubah.", id:"Setelah membaca buku ini, saya berpikir untuk memperbaiki cara hidup saya selama ini."},
+      {q:"このホテルは、どの部屋からも素晴らしい<u>景⾊</u>が⾒える。", opts:["けしき","けしょく","けいしき","けいしょく"], ans:0, exp:"「景⾊」＝けしき, pemandangan.", id:"Dari kamar mana pun di hotel ini, pemandangannya terlihat sangat indah."},
+      {q:"6⽉から7⽉は<u>梅⾬</u>の季節だ。", opts:["つゆ","つうゆ","つゆう","つうゆう"], ans:0, exp:"「梅⾬」＝つゆ, musim hujan Jepang.", id:"Bulan Juni sampai Juli adalah musim hujan."}
+    ]},
+    { label: "問題2", items: [
+      {q:"急いで<u>おゆ</u>を沸かしてください。", opts:["お浴","お温","お湯","お熱"], ans:2, exp:"「お湯」＝おゆ, air panas.", id:"Tolong cepat panaskan air."},
+      {q:"その製品の<u>げんりょう</u>は⽯油です。", opts:["原料","原料","厚科","原料"], ans:0, exp:"「原料」＝げんりょう, bahan baku.", id:"Bahan baku produk itu adalah minyak bumi."},
+      {q:"ずっと付き合っていた⼆⼈が、ついに<u>こんやく</u>したそうです。", opts:["混約","混役","婚約","婚役"], ans:2, exp:"「婚約」＝こんやく, pertunangan.", id:"Dua orang yang sudah lama berpacaran itu katanya akhirnya bertunangan."}
+    ]},
+    { label: "問題3", items: [
+      {q:"最近、登⼭が<u>はやって</u>いるそうだ。", opts:["体にいい","⼈気がある","危険が多い","減ってきている"], ans:1, exp:"「はやる」≈「⼈気がある」, populer.", id:"Akhir-akhir ini, mendaki gunung katanya sedang populer."},
+      {q:"彼⼥は本当に<u>頭にきている</u>みたいだね。顔が真っ⾚だ。", opts:["泣いている","怒っている","困っている","笑っている"], ans:1, exp:"「頭にくる」≈「怒っている」, marah.", id:"Sepertinya dia benar-benar marah. Wajahnya merah sekali."},
+      {q:"今夜のパーティーは7時<u>スタート</u>です。", opts:["⼊場","出発","開始","終了"], ans:2, exp:"「スタート」≈「開始」, mulai.", id:"Pesta malam ini dimulai pukul tujuh."},
+      {q:"運動したら、体が<u>ぽかぽか</u>してきた。", opts:["ぬれて","疲れて","痛くなって","温かくなって"], ans:3, exp:"「ぽかぽか」≈「温かくなって」, hangat.", id:"Setelah berolahraga, tubuh saya terasa hangat."}
+    ]},
+    { label: "問題4", items: [
+      {q:"サルからヒトへの（　）について研究している。", opts:["進化","進⾏","進出","前進"], ans:0, exp:"「進化」＝しんか, evolusi.", id:"Sedang meneliti tentang evolusi dari monyet ke manusia."},
+      {q:"難しい問題の前に、まずは（　）ことから復習しましょう。", opts:["⼀般的な","基本的な","平均的な","規則的な"], ans:1, exp:"「基本的な」＝きほんてきな, dasar/fundamental.", id:"Sebelum soal yang sulit, mari mengulang dulu hal-hal dasar."},
+      {q:"友達の引っ越しの（　）にコーヒーカップをプレゼントした。", opts:["お礼","お祈り","お祝い","お願い"], ans:2, exp:"「お祝い」＝おいわい, ucapan selamat/perayaan.", id:"Saya menghadiahkan cangkir kopi untuk merayakan kepindahan teman."},
+      {q:"（　）、明⽇は⾬が降りませんように。", opts:["どうか","どうぞ","どうも","どうでも"], ans:0, exp:"「どうか」＝harapan/permintaan.", id:"Semoga besok tidak turun hujan."},
+      {q:"席につくと、（　）の料理がすぐに出てきた。", opts:["できたて","できあがり","仕上げ","仕上がり"], ans:0, exp:"「できたて」＝baru selesai dibuat.", id:"Begitu duduk, makanan yang baru dibuat langsung disajikan."},
+      {q:"来⽉、転勤することになりました。今まで（　）。", opts:["おかげさまで","おまちどおさま","お世話になりました","ごぶさたしていました"], ans:2, exp:"「お世話になりました」＝terima kasih atas bantuannya.", id:"Bulan depan saya akan dipindahkan kerja. Terima kasih banyak atas bantuan Anda selama ini."}
+    ]},
+    { label: "問題5", items: [
+      {q:"<u>冷たい</u>", opts:["この地⽅は、夏は暑く冬は冷たい","彼⼥はいつも私に対する態度が冷たい","部⻑はどんな時でも冷たい態度だ","あんなに彼のことが好きなのに、冷たい"], ans:1, exp:"「冷たい」＝sikap dingin terhadap orang lain. 彼⼥はいつも私に対する態度が冷たい。", id:"Sikapnya terhadap saya selalu dingin."},
+      {q:"<u>なかなか</u>", opts:["私はなかなか職しない","妹が作った料理はなかなかおいしい","何度もやってみたが、なかなかうまくいかない","ひまじゃなかった、なかなか"], ans:2, exp:"「なかなか〜ない」＝sulit berhasil. 何度もやってみたが、なかなかうまくいかない。", id:"Sudah mencoba berkali-kali, tetapi tetap tidak berjalan dengan baik."}
+    ]}
+  ]
+}
+];
+
+const KADAI_DATA = [...KADAI_PART1, ...KADAI_PART2, ...KADAI_PART3].filter(d => d.groups.length > 0);
+
+
+
+// ===== TRAINING FOKUS DATA (集中トレーニング) =====
+// Setiap soal: q (kalimat dengan blank), opts (2 pilihan), ans (index 0/1), exp (penjelasan), id (terjemahan Indonesia)
+const TRAINING_DATA = [
+{
+  cat: "動詞１",
+  items: [
+    {q:"銀⾏に寄ってお⾦を（　）から⾏こう。", opts:["さげて","おろして"], ans:1, exp:"「お⾦をおろす」＝mengambil uang dari bank/ATM.", id:"Singgah ke bank dan menarik uang dulu sebelum pergi."},
+    {q:"薬が（　）、熱が下がってきた。", opts:["きいて","みえて"], ans:0, exp:"「薬がきく」＝obatnya bereaksi/mempan.", id:"Obatnya manjur, demamnya mulai turun."},
+    {q:"最後に使った⼈は電源を（　）おいてください。", opts:["きって","しめて"], ans:0, exp:"「電源をきる」＝mematikan daya/listrik.", id:"Orang yang terakhir memakai, mohon matikan listriknya."},
+    {q:"まず、みんなで話し合って計画を（　）。", opts:["たてましょう","つくりましょう"], ans:0, exp:"「計画を⽴てる」＝ungkapan umum membuat rencana.", id:"Pertama, mari berdiskusi bersama dan menyusun rencana."},
+    {q:"では、出席を（　）。等未さん、井上さん、上⽥さん…", opts:["とります","よびます"], ans:0, exp:"「出席をとる」＝melakukan presensi/pengecekan kehadiran.", id:"Baik, saya akan mengabsen kehadiran. Tonomi-san, Inoue-san, Ueda-san…"},
+    {q:"⼤変です。急いで救急⾞を（　）ください。", opts:["とめて","よんで"], ans:1, exp:"「救急⾞をよぶ」＝memanggil ambulans.", id:"Gawat. Tolong cepat panggil ambulans."},
+    {q:"彼はつまらなそうに、⼤きなあくびを（　）。", opts:["した","だした"], ans:0, exp:"「あくびをする」＝ekspresi umum untuk menguap.", id:"Dia tampak bosan dan menguap besar."},
+    {q:"松⽊課⻑は今、席を（　）います。", opts:["なくして","はずして"], ans:1, exp:"「席をはずす」＝sedang tidak ada di tempat duduknya.", id:"Kepala seksi Matsuki sedang tidak ada di tempat."},
+    {q:"窓を開けて寝たら、⾵邪を（　）しまった。", opts:["ひいて","もらって"], ans:0, exp:"「⾵邪をひく」＝terkena masuk angin/flu.", id:"Karena tidur dengan jendela terbuka, saya jadi masuk angin/flu."},
+    {q:"⽇が（　）前に帰りましょう。", opts:["くれる","さがる"], ans:0, exp:"「⽇がくれる」＝matahari terbenam.", id:"Mari pulang sebelum matahari terbenam."}
+  ]
+},
+{
+  cat: "動詞２",
+  items: [
+    {q:"ちょっと休みましょう。コーヒーを（　）ね。", opts:["にます","いれます"], ans:1, exp:"「コーヒーをいれる」＝membuat kopi.", id:"Mari istirahat sebentar. Saya buatkan kopi ya."},
+    {q:"寒くなってきたから、厚い⽑布を（　）寝よう。", opts:["かけて","のせて"], ans:0, exp:"「⽑布をかける」＝menyelimuti tubuh dengan selimut.", id:"Karena sudah mulai dingin, mari tidur dengan menyelimuti diri memakai selimut tebal."},
+    {q:"かさを（　）⾃転⾞に乗るのは危ないですよ。", opts:["さして","ついて"], ans:0, exp:"「かさをさす」＝memegang/menggunakan payung.", id:"Berbahaya mengendarai sepeda sambil memegang payung."},
+    {q:"私が運転免許証を（　）のは、⼆⼗歳のときです。", opts:["うけた","とった"], ans:1, exp:"「免許をとる」＝mendapatkan SIM.", id:"Saya mendapatkan SIM ketika berusia 20 tahun."},
+    {q:"わからない⾔葉があったら、すぐ辞書を（　）ようにしています。", opts:["とる","ひく"], ans:1, exp:"「辞書をひく」＝mencari arti kata di kamus.", id:"Kalau ada kata yang tidak saya mengerti, saya langsung membuka kamus."},
+    {q:"「ええ」「それで」とあいづちを（　）ながら、話を聞いていた。", opts:["うち","だし"], ans:0, exp:"「あいづちをうつ」＝memberi respon kecil dalam percakapan.", id:"Sambil mengangguk dan berkata 'iya', 'lalu', dia mendengarkan pembicaraan."},
+    {q:"ああ、のどが（　）。⽔をください。", opts:["ひえた","かわいた"], ans:1, exp:"「のどがかわいた」＝haus.", id:"Aduh, tenggorokan saya haus. Tolong beri saya air."},
+    {q:"スポーツをして汗を（　）のは、気持ちがいい。", opts:["かく","ひく"], ans:0, exp:"「汗をかく」＝berkeringat.", id:"Berkeringat saat berolahraga itu terasa menyegarkan."},
+    {q:"病気のときは⼗分睡眠を（　）ほうがいいですよ。", opts:["した","とった"], ans:1, exp:"「睡眠をとる」＝cukup tidur.", id:"Saat sakit, sebaiknya cukup istirahat tidur."},
+    {q:"3年働いてお⾦が（　）、留学しようと思っている。", opts:["たまったら","あつまったら"], ans:0, exp:"「お⾦がたまる」＝menabung/uang terkumpul secara pribadi.", id:"Setelah bekerja 3 tahun dan uang terkumpul, saya ingin belajar ke luar negeri."}
+  ]
+},
+{
+  cat: "カタカナ語",
+  items: [
+    {q:"イタリア料理のレストランで（　）しています。", opts:["アルバイト","ボランティア"], ans:0, exp:"「アルバイト」＝kerja paruh waktu, cocok dengan konteks bekerja di restoran.", id:"Saya bekerja paruh waktu di restoran masakan Italia."},
+    {q:"カメラの充電をしたいんですが、この部屋の（　）はどこですか。", opts:["スイッチ","コンセント"], ans:1, exp:"「コンセント」＝stop kontak/colokan, untuk mengisi daya kamera.", id:"Saya ingin mengisi daya kamera, di mana stopkontak di ruangan ini?"},
+    {q:"お⾦の問題で（　）を起こした学⽣から相談を受けた。", opts:["トラブル","トラベル"], ans:0, exp:"「トラブル」＝masalah/trouble, relevan dengan masalah uang.", id:"Saya menerima konsultasi dari mahasiswa yang mengalami masalah keuangan."},
+    {q:"話している途中で、携帯電話の（　）が切れてしまった。", opts:["エネルギー","バッテリー"], ans:1, exp:"「バッテリー」＝baterai. HP mati karena baterai habis.", id:"Di tengah pembicaraan, baterai ponsel saya habis."},
+    {q:"⽩いハトは、平和の（　）だ。", opts:["シンボル","センター"], ans:0, exp:"「シンボル」＝simbol. Merpati putih melambangkan perdamaian.", id:"Merpati putih adalah simbol perdamaian."},
+    {q:"シャツとズボンを洗濯したら、（　）にかけて、ベランダに⼲してください。", opts:["ハンガー","ロッカー"], ans:0, exp:"「ハンガー」＝gantungan, digunakan untuk menjemur pakaian.", id:"Setelah mencuci kemeja dan celana, gantunglah di hanger dan jemur di balkon."},
+    {q:"スーパーはとても込んでいて、（　）には⻑い列ができていた。", opts:["レジ","ポスト"], ans:0, exp:"「レジ」＝kasir. Wajar ada antrean panjang di kasir.", id:"Supermarket sangat ramai, dan antrean panjang terbentuk di kasir."},
+    {q:"ちょっとそこの（　）を取ってもらえませんか。", opts:["ブッシュ","ティッシュ"], ans:1, exp:"「ティッシュ」＝tisu, umum digunakan di rumah dan restoran.", id:"Bisa tolong ambilkan tisu yang di sana?"},
+    {q:"外国語を勉強して、多くの⼈と（　）をとれるようになりたい。", opts:["メッセージ","コミュニケーション"], ans:1, exp:"「コミュニケーション」＝komunikasi, tujuan dari belajar bahasa asing.", id:"Saya ingin belajar bahasa asing agar bisa berkomunikasi dengan banyak orang."},
+    {q:"夜は部屋の中が⾒えないように、（　）を閉めたほうがいい。", opts:["カーテン","シャッター"], ans:0, exp:"「カーテン」＝tirai, digunakan untuk menjaga privasi pada malam hari.", id:"Pada malam hari, sebaiknya menutup tirai agar bagian dalam kamar tidak terlihat."}
+  ]
+},
+{
+  cat: "擬⾳語・擬態語",
+  items: [
+    {q:"⽇本語が（　）ですね。どれくらい勉強したんですか。", opts:["へらへら","ぺらぺら"], ans:1, exp:"「ぺらぺら」＝lancar berbicara dalam bahasa asing.", id:"Bahasa Jepang Anda lancar sekali. Sudah belajar berapa lama?"},
+    {q:"よっぱらって、⾜が（　）する。", opts:["ふらふら","ぶらぶら"], ans:0, exp:"「ふらふら」＝sempoyongan (karena mabuk/lelah).", id:"Karena mabuk, kaki terasa sempoyongan."},
+    {q:"彼⼥はさっきから何を（　）怒っているのだろう。", opts:["ふんふん","ぶんぶん"], ans:1, exp:"「ぶんぶん」＝dengan kesal (ekspresi marah).", id:"Sejak tadi, kenapa ya dia marah-marah terus."},
+    {q:"⽇曜⽇は何もしないで家で（　）していた。", opts:["ころころ","ごろごろ"], ans:1, exp:"「ごろごろ」＝santai-santai (bermalas-malasan).", id:"Hari Minggu saya tidak melakukan apa-apa dan bermalas-malasan di rumah."},
+    {q:"あの⼈はいつも（　）していて、感じがいい⼈だ。", opts:["にこにこ","もこもこ"], ans:0, exp:"「にこにこ」＝tersenyum ramah.", id:"Orang itu selalu tersenyum dan memberi kesan yang baik."},
+    {q:"何だか（　）してるようですが、何かいいことでもあったんですか。", opts:["うきうき","めきめき"], ans:0, exp:"「うきうき」＝perasaan senang/berbunga-bunga.", id:"Kamu kelihatan gembira, apakah ada hal baik yang terjadi?"},
+    {q:"パソコンの調⼦が悪いと、（　）する。", opts:["いらいら","ちくちく"], ans:0, exp:"「いらいら」＝frustrasi/jengkel.", id:"Kalau komputer bermasalah, rasanya jadi kesal."},
+    {q:"ゆうべは（　）寝たので、今⽇は気分がいい。", opts:["くっきり","ぐっすり"], ans:1, exp:"「ぐっすり」＝tidur nyenyak.", id:"Tadi malam saya tidur nyenyak, jadi hari ini perasaan saya baik."},
+    {q:"先⽣はいつも9時（　）に教室に⼊ってくる。", opts:["ぎっしり","ぴったり"], ans:1, exp:"「ぴったり」＝tepat waktu, pas.", id:"Guru selalu masuk kelas tepat pukul 9."},
+    {q:"間に合ってよかった。（　）した。", opts:["さっと","ほっと"], ans:1, exp:"「ほっと」＝merasa lega.", id:"Syukurlah sempat tepat waktu. Saya lega."}
+  ]
+},
+{
+  cat: "慣⽤句１",
+  items: [
+    {q:"卒業式での先⽣の⾔葉が、私の（　）。", opts:["⼼を打った","⼼を込めた"], ans:0, exp:"「⼼を打つ」＝sangat menyentuh hati.", id:"Kata-kata guru saat wisuda sangat menyentuh hati saya."},
+    {q:"お世話になっている⼈に、（　）⼿紙を書いた。", opts:["⼼を打って","⼼を込めて"], ans:1, exp:"「⼼を込めて」＝dengan sepenuh hati.", id:"Saya menulis surat dengan sepenuh hati kepada orang yang telah banyak membantu saya."},
+    {q:"沖縄で⾒た美しい海の⾵景が、今でも（　）いる。", opts:["⼼に残って","⼼に残して"], ans:0, exp:"「⼼に残る」＝membekas dalam hati.", id:"Pemandangan laut indah yang saya lihat di Okinawa masih membekas di hati saya."},
+    {q:"少し⾼かったが、⾊が（　）ので、買うことにした。", opts:["気にいった","気になった"], ans:0, exp:"「気に⼊る」＝menyukai.", id:"Harganya agak mahal, tetapi karena saya suka warnanya, saya memutuskan membelinya."},
+    {q:"友達の様⼦が（　）ので、先⽣に連絡した。", opts:["気にいった","気になった"], ans:1, exp:"「気になる」＝merasa khawatir/tertarik.", id:"Karena saya khawatir dengan kondisi teman saya, saya menghubungi guru."},
+    {q:"明⽇は寒くなるそうですから、⾵邪に（　）ください。", opts:["気をつけて","気をつかって"], ans:0, exp:"「気をつける」＝berhati-hati.", id:"Katanya besok akan dingin, jadi hati-hatilah agar tidak masuk angin."},
+    {q:"私が⾜をけがしたとき、友達は（　）ゆっくり歩いてくれた。", opts:["気をつけて","気をつかって"], ans:1, exp:"「気をつかう」＝bersikap perhatian, mempedulikan.", id:"Saat kaki saya cedera, teman saya berjalan pelan karena memperhatikan saya."},
+    {q:"隣の部屋から変なにおいがするのに（　）。", opts:["気がついた","気をつけた"], ans:0, exp:"「気がつく」＝menyadari.", id:"Saya menyadari ada bau aneh dari kamar sebelah."},
+    {q:"今⽇は⾵が強いから、出かけるのは（　）。", opts:["気がすまない","気がすすまない"], ans:1, exp:"「気がすすまない」＝tidak berminat, enggan.", id:"Karena hari ini anginnya kencang, saya tidak terlalu ingin keluar."},
+    {q:"私は中村さんととても（　）。", opts:["気が合う","気がする"], ans:0, exp:"「気が合う」＝cocok satu sama lain, akrab.", id:"Saya sangat cocok dengan Nakamura-san."}
+  ]
+},
+{
+  cat: "慣⽤句２",
+  items: [
+    {q:"⺟は⽢いものに（　）。", opts:["⽬がない","⽬に⼊らない"], ans:0, exp:"「⽬がない」＝sangat suka/lemah terhadap sesuatu (konteks makanan).", id:"Ibu saya sangat suka makanan manis."},
+    {q:"彼は仕事が忙しすぎて、まわりのことは（　）ようだ。", opts:["⽬がない","⽬に⼊らない"], ans:1, exp:"「⽬に⼊らない」＝tidak memperhatikan sekitar karena sibuk.", id:"Dia terlalu sibuk bekerja sampai tidak memperhatikan sekelilingnya."},
+    {q:"祖⽗は（　）ので、⼤きい声で話さないと聞こえない。", opts:["⽿が痛い","⽿が遠い"], ans:1, exp:"「⽿が遠い」＝pendengarannya lemah.", id:"Kakek saya pendengarannya kurang baik, jadi harus berbicara keras."},
+    {q:"リンダさんが急に帰国するといううわさが（　）。", opts:["⽿に⼊った","⽿に⼊れた"], ans:0, exp:"「⽿に⼊る」＝mendengar secara tidak langsung/terdengar.", id:"Saya mendengar rumor bahwa Linda-san akan tiba-tiba pulang ke negaranya."},
+    {q:"⾚ちゃんは、まわりにあるものを何でも（　）から、気をつけないといけない。", opts:["⼝に合う","⼝にする"], ans:1, exp:"「⼝にする」＝memasukkan ke dalam mulut.", id:"Bayi memasukkan apa saja ke mulutnya, jadi harus berhati-hati."},
+    {q:"あの⼈は（　）から、⼤切なことは⾔わないほうがいい。", opts:["⼝が軽い","⼝をきく"], ans:0, exp:"「⼝が軽い」＝suka membocorkan rahasia.", id:"Orang itu tidak bisa menyimpan rahasia, jadi sebaiknya jangan mengatakan hal penting."},
+    {q:"仕事が終わったら、飲み会に（　）つもりだ。", opts:["顔に出る","顔を出す"], ans:1, exp:"「顔を出す」＝mampir.", id:"Setelah selesai kerja, saya berencana mampir ke acara minum-minum."},
+    {q:"妹は思っていることがすぐ（　）から、うそがつけない。", opts:["顔に出る","顔を出す"], ans:0, exp:"「顔に出る」＝terlihat di wajah (ekspresi jujur).", id:"Adik perempuan saya langsung menunjukkan perasaannya di wajah, jadi tidak bisa berbohong."},
+    {q:"彼⼥のことが⼼配で、明⽇の試験勉強が（　）。", opts:["⼿につかない","⾝につかない"], ans:0, exp:"「⼿につかない」＝tidak bisa fokus/mengerjakan karena terganggu pikiran.", id:"Saya khawatir tentang dia, sehingga tidak bisa fokus belajar untuk ujian besok."},
+    {q:"欲しい本がなかなか（　）。", opts:["⼿に⼊らない","⼿に⼊れない"], ans:0, exp:"「⼿に⼊らない」＝sulit untuk didapatkan.", id:"Buku yang saya inginkan sulit didapat."}
+  ]
+},
+{
+  cat: "敬語１",
+  items: [
+    {q:"あの、隣に住んでいる（　）ですが、ちょっとよろしいでしょうか。", opts:["⼈","者"], ans:1, exp:"「者」＝lebih sopan dan formal, digunakan dalam bahasa hormat.", id:"Maaf, saya orang yang tinggal di sebelah, boleh bicara sebentar?"},
+    {q:"（　）ありがとうございます。Aカンパニーでございます。", opts:["お電話","ご電話"], ans:0, exp:"「お電話」＝bentuk yang benar diucapkan dalam ucapan sopan ini.", id:"Terima kasih atas teleponnya. Ini perusahaan A."},
+    {q:"少し（　）。", opts:["お待ちいただきますか","お待ちいただけますか"], ans:1, exp:"「お待ちいただけますか」＝lebih sopan dan alami.", id:"Mohon tunggu sebentar."},
+    {q:"お客様、私がお荷物を（　）。", opts:["お持ちします","お持ちになります"], ans:0, exp:"「お持ちします」＝bentuk hormat untuk tindakan pembicara.", id:"Tuan/Nyonya, saya akan membawakan barang Anda."},
+    {q:"これ、よかったら（　）ください。", opts:["いただいて","召し上がって"], ans:1, exp:"「召し上がってください」＝sopan untuk meminta orang lain makan/minum.", id:"Kalau berkenan, silakan dinikmati."},
+    {q:"ここに、お名前を（　）ください。", opts:["お書き","お書きして"], ans:1, exp:"「お書きして」＝bentuk permintaan sopan yang lengkap.", id:"Silakan tulis nama Anda di sini."},
+    {q:"社⻑、この資料を（　）。", opts:["拝⾒されましたか","ご覧になりましたか"], ans:1, exp:"「ご覧になりましたか」＝bentuk sopan untuk melihat (honorifik).", id:"Direktur, apakah Anda sudah melihat dokumen ini?"},
+    {q:"3時ごろ、先⽣の研究室に（　）よろしいでしょうか。", opts:["参って","伺って"], ans:1, exp:"「伺って」＝lebih sopan untuk menyatakan pergi/mengunjungi atasan.", id:"Bolehkah saya berkunjung ke ruang penelitian Bapak/Ibu guru sekitar jam 3?"},
+    {q:"いろいろ（　）、ありがとうございました。", opts:["お教えになって","教えてくださって"], ans:1, exp:"「教えてくださって」＝ungkapan terima kasih sopan dari penerima informasi.", id:"Terima kasih banyak telah mengajarkan berbagai hal kepada saya."},
+    {q:"課⻑はこの件について、（　）。", opts:["ご存じですか","存じていらっしゃいますか"], ans:0, exp:"「ご存じですか」＝bentuk sopan biasa untuk 'tahu'.", id:"Apakah kepala bagian mengetahui tentang masalah ini?"}
+  ]
+},
+{
+  cat: "敬語２",
+  items: [
+    {q:"（　）はお決まりでしょうか。", opts:["お注⽂","ご注⽂"], ans:1, exp:"「ご注⽂」＝bentuk kehormatan yang benar untuk kata benda seperti pesanan.", id:"Apakah pesanan Anda sudah ditentukan?"},
+    {q:"お帰りになるときは、かさを（　）。", opts:["お忘れなく","お忘れないで"], ans:0, exp:"「お忘れなく」＝bentuk sopan umum untuk peringatan.", id:"Saat pulang, jangan lupa payungnya."},
+    {q:"社⻑は、それでいいと（　）。", opts:["申されました","おっしゃいました"], ans:1, exp:"「おっしゃいました」＝bentuk kehormatan (尊敬語) dari ⾔う.", id:"Direktur mengatakan bahwa itu tidak masalah."},
+    {q:"部⻑、何を（　）。", opts:["いただかれますか","お飲みになりますか"], ans:1, exp:"「お飲みになりますか」＝bentuk kehormatan (尊敬語) dari 飲む.", id:"Kepala bagian, Anda ingin minum apa?"},
+    {q:"伊藤さんには本当に（　）。", opts:["お世話になりました","お世話していただきました"], ans:0, exp:"「お世話になりました」＝ekspresi sopan standar terima kasih.", id:"Saya benar-benar berterima kasih atas bantuan Ito-san."},
+    {q:"どなたでも（　）いただけます。", opts:["ご参加","ご参加して"], ans:0, exp:"「ご参加いただけます」sudah benar dan cukup sopan.", id:"Siapa pun boleh ikut berpartisipasi."},
+    {q:"ご迷惑を（　）、申しわけございません。", opts:["おかけして","かけられて"], ans:0, exp:"「ご迷惑をおかけして」＝ungkapan permintaan maaf sopan yang benar.", id:"Mohon maaf telah merepotkan Anda."},
+    {q:"お忙しいところ申しわけありませんが、（　）、明⽇までにご返信ください。", opts:["できれば","よろしかったら"], ans:1, exp:"「よろしかったら」＝bentuk sopan dari 'kalau tidak keberatan'.", id:"Maaf mengganggu kesibukan Anda, jika berkenan mohon balas sampai besok."},
+    {q:"すみません、お⼿洗いを（　）よろしいでしょうか。", opts:["お貸ししても","お借りしても"], ans:1, exp:"「お借りしても」digunakan karena pembicara meminta izin meminjam.", id:"Permisi, bolehkah saya meminjam toilet?"},
+    {q:"ぜひ、当店へ（　）。", opts:["お来て","お越しください"], ans:1, exp:"「お越しください」＝bentuk hormat untuk datang kepada orang lain.", id:"Silakan datang ke toko kami."}
+  ]
+},
+{
+  cat: "助数詞",
+  items: [
+    {q:"このくつ下は、5（　）で1000円です。", opts:["⾜","本"], ans:0, exp:"「⾜（あし）」dipakai untuk benda yang berpasangan seperti kaus kaki.", id:"Kaos kaki ini dijual 5 pasang per set."},
+    {q:"この動物園には、パンダが1（　）もいなくなってしまった。", opts:["頭","匹"], ans:0, exp:"「頭（とう）」dipakai untuk hewan besar seperti panda.", id:"Di kebun binatang ini sudah tidak ada satu pun panda."},
+    {q:"鈴⽊さんは猫が⼤好きで、家で8（　）も飼っているそうだ。", opts:["頭","匹"], ans:1, exp:"「匹（ひき）」dipakai untuk hewan kecil seperti kucing.", id:"Suzuki-san sangat suka kucing dan memelihara 8 ekor di rumah."},
+    {q:"神社に⾏くには、ここから132（　）もの階段を上らなければならない。", opts:["階","段"], ans:1, exp:"「段（だん）」dipakai untuk menghitung anak tangga.", id:"Untuk pergi ke kuil, harus menaiki 132 anak tangga dari sini."},
+    {q:"この地域の中学校4（　）が集まって、クラシックの演奏会を開いた。", opts:["学","校"], ans:1, exp:"「校（こう）」dipakai untuk menghitung sekolah.", id:"Empat SMP di daerah ini berkumpul dan mengadakan konser musik klasik."},
+    {q:"毎朝、コップ1（　）の⽜乳を飲むようにしている。", opts:["杯","本"], ans:0, exp:"「杯（はい）」dipakai untuk menghitung minuman dalam gelas/cangkir.", id:"Setiap pagi saya membiasakan minum satu gelas susu."},
+    {q:"このCDには、⼈気歌⼿の代表的な歌が20（　）も⼊っている。", opts:["歌","曲"], ans:1, exp:"「曲（きょく）」dipakai untuk menghitung lagu.", id:"CD ini berisi 20 lagu terkenal dari penyanyi populer."},
+    {q:"東京都内では、昨⽇⼀⽇で100（　）以上の交通事故が起きた。", opts:["回","件"], ans:1, exp:"「件（けん）」dipakai untuk menghitung kejadian (kasus).", id:"Di Tokyo, lebih dari 100 kasus kecelakaan lalu lintas terjadi dalam satu hari kemarin."},
+    {q:"そのプレゼントには、全国から約⼀万（　）もの応募はがきが届いた。", opts:["通","枚"], ans:0, exp:"「通（つう）」dipakai untuk menghitung surat/kiriman.", id:"Untuk hadiah tersebut, sekitar 10.000 kartu pos pendaftaran datang dari seluruh negeri."},
+    {q:"⼩林さんの家は、あの⾓を曲がって2（　）の⾚い屋根の家です。", opts:["番","⽬"], ans:0, exp:"「番（ばん）」dipakai untuk urutan nomor tempat/alamat.", id:"Rumah Kobayashi-san adalah rumah beratap merah kedua setelah belok di sudut itu."}
+  ]
+},
+{
+  cat: "挨拶表現",
+  items: [
+    {q:"先輩、今まで本当に（　）。", opts:["お世話になりました","お世話していただきました"], ans:0, exp:"Ungkapan salam hormat kepada orang yang telah banyak membantu.", id:"Kak senior, terima kasih banyak atas semua bantuan Anda selama ini."},
+    {q:"A: 熱があるようなので、お先に失礼します。 B: ⼤丈夫ですか。（　）。", opts:["お⼤事で","お⼤事に"], ans:1, exp:"「お⼤事に」＝ucapan untuk mendoakan kesembuhan orang sakit.", id:"A: Sepertinya saya demam, jadi saya pulang dulu. B: Tidak apa-apa? Jaga kesehatan ya."},
+    {q:"A: 来週、国へ帰ることになったんです。 B: それは急ですね。どうぞ（　）。", opts:["お元気で","お元気に"], ans:0, exp:"「お元気で」＝bentuk salam perpisahan yang sopan, menjaga kesehatan.", id:"A: Minggu depan saya akan pulang ke negara saya. B: Cepat sekali ya. Semoga sehat selalu."},
+    {q:"ご結婚おめでとうございます。どうぞ（　）。", opts:["お幸せで","お幸せに"], ans:1, exp:"「お幸せに」＝ucapan harapan kebahagiaan untuk pengantin.", id:"Selamat atas pernikahannya. Semoga berbahagia."},
+    {q:"A: 次に会うのは新年ですね。 B: ええ、そうですね。（　）。", opts:["よいお年で","よいお年を"], ans:1, exp:"「よいお年を」＝salam khas akhir tahun.", id:"A: Kita bertemu lagi saat tahun baru ya. B: Iya. Selamat tahun baru."},
+    {q:"A: どうぞお⼊りください。 B: （　）。", opts:["おじゃまです","おじゃまします"], ans:1, exp:"「おじゃまします」＝ungkapan sopan saat masuk rumah/ruangan orang.", id:"A: Silakan masuk. B: Permisi, saya masuk."},
+    {q:"A: これ、どうぞ召し上がってください。 B: すみません。じゃ（　）。", opts:["遠慮なく","遠慮なくて"], ans:0, exp:"「遠慮なく」＝menerima dengan nada sopan tapi menerima.", id:"A: Silakan dimakan. B: Terima kasih, kalau begitu saya terima."},
+    {q:"A: 今⽇は⾞で来たので、（　）。", opts:["ご遠慮なく","おかまいなく"], ans:1, exp:"「おかまいなく」digunakan untuk meminta orang tidak repot untuk kita.", id:"A: Hari ini saya datang naik mobil, jadi jangan sungkan."},
+    {q:"A: 次の⽅、どうぞ。 B: （　）。", opts:["失礼します","失礼しました"], ans:0, exp:"「失礼します」diucapkan saat memasuki ruangan secara sopan.", id:"A: Orang berikutnya, silakan. B: Permisi."},
+    {q:"先⽣: ジョンさん、⼤学合格おめでとう! ジョン: ありがとうございます。先⽣の（　）。", opts:["おかげです","おかげさまです"], ans:0, exp:"「おかげです」digunakan saat menyatakan terima kasih, lebih umum dan sederhana.", id:"Guru: John-san, selamat lulus ujian masuk universitas! John: Terima kasih. Ini berkat Anda."}
+  ]
+}
+];
+
+
+
+// ===== State =====
+let topTab = 'kadai';
+let kadaiMode = 'all';
+let trainingMode = 'all';
+// Track selections in plain JS arrays (not relying on classList query)
+let _selectedDays = [];
+let _selectedCats = [];
+let FLAT = [];
+let current = 0;
+let answers = [];
+let answered = [];
+
+function setTopTab(t){
+  topTab = t;
+  document.getElementById('tabKadaiBtn').classList.toggle('active', t==='kadai');
+  document.getElementById('tabTrainingBtn').classList.toggle('active', t==='training');
+  document.getElementById('kadaiControls').classList.toggle('hidden', t!=='kadai');
+  document.getElementById('trainingControls').classList.toggle('hidden', t!=='training');
+}
+
+function setKadaiMode(m){
+  kadaiMode = m;
+  document.getElementById('modeAllBtn').classList.toggle('active', m==='all');
+  document.getElementById('modePickBtn').classList.toggle('active', m==='pick');
+  document.getElementById('dayPickerWrap').classList.toggle('hidden', m!=='pick');
+}
+
+function setTrainingMode(m){
+  trainingMode = m;
+  document.getElementById('trAllBtn').classList.toggle('active', m==='all');
+  document.getElementById('trPickBtn').classList.toggle('active', m==='pick');
+  document.getElementById('catPickerWrap').classList.toggle('hidden', m!=='pick');
+}
+
+function buildDayPicker(){
+  _selectedDays = [];
+  const wrap = document.getElementById('dayPicker');
+  wrap.innerHTML = '';
+  KADAI_DATA.forEach(d => {
+    const dayNum = d.day;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = dayNum;
+    b.onclick = function(){
+      const idx = _selectedDays.indexOf(dayNum);
+      if(idx === -1){
+        _selectedDays.push(dayNum);
+        this.classList.add('active');
+      } else {
+        _selectedDays.splice(idx, 1);
+        this.classList.remove('active');
+      }
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function buildCatPicker(){
+  _selectedCats = [];
+  const wrap = document.getElementById('catPicker');
+  wrap.innerHTML = '';
+  TRAINING_DATA.forEach((c, idx) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = c.cat;
+    b.onclick = function(){
+      const pos = _selectedCats.indexOf(idx);
+      if(pos === -1){
+        _selectedCats.push(idx);
+        this.classList.add('active');
+      } else {
+        _selectedCats.splice(pos, 1);
+        this.classList.remove('active');
+      }
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function buildFlatKadai(daysFilter){
+  const flat = [];
+  KADAI_DATA.forEach(d => {
+    if(daysFilter && !daysFilter.includes(d.day)) return;
+    d.groups.forEach(g => {
+      g.items.forEach(it => {
+        flat.push({
+          source:'kadai', day:d.day, groupLabel:g.label,
+          q:it.q, opts:it.opts, ans:it.ans, exp:it.exp, id:it.id||''
+        });
+      });
+    });
+  });
+  return flat;
+}
+
+function buildFlatTraining(catFilter){
+  const flat = [];
+  TRAINING_DATA.forEach((c, idx) => {
+    if(catFilter && !catFilter.includes(idx)) return;
+    c.items.forEach(it => {
+      flat.push({
+        source:'training', cat:c.cat,
+        q:it.q, opts:it.opts, ans:it.ans, exp:it.exp, id:it.id||''
+      });
+    });
+  });
+  return flat;
+}
+
+function updateCoverInfo(){
+  const totalKadai = buildFlatKadai(null).length;
+  const totalTraining = buildFlatTraining(null).length;
+  const totalDays = KADAI_DATA.length;
+  document.getElementById('coverSub').textContent = '文字・語彙・表現・敬語などの問題を1問ずつ解いて、その場で解説と和訳を確認できます。タブで「課題」か「集中トレーニング」を選んでください。';
+  document.getElementById('coverMeta').innerHTML =
+    '<div><b>'+totalKadai+'問</b> 課題</div><div><b>'+totalDays+'</b> 日分</div><div><b>'+totalTraining+'問</b> トレーニング</div>';
+}
+
+function startQuiz(){
+  if(topTab === 'kadai'){
+    let daysFilter = null;
+    if(kadaiMode === 'pick'){
+      if(_selectedDays.length === 0){ alert('少なくとも1つの課題を選んでください。'); return; }
+      daysFilter = _selectedDays.slice().sort((a,b)=>a-b);
+    }
+    FLAT = buildFlatKadai(daysFilter);
+  } else {
+    let catFilter = null;
+    if(trainingMode === 'pick'){
+      if(_selectedCats.length === 0){ alert('少なくとも1つのカテゴリーを選んでください。'); return; }
+      catFilter = _selectedCats.slice();
+    }
+    FLAT = buildFlatTraining(catFilter);
+  }
+  if(FLAT.length === 0){ alert('問題が見つかりませんでした。'); return; }
+
+  answers = new Array(FLAT.length).fill(null);
+  answered = new Array(FLAT.length).fill(false);
+  current = 0;
+
+  document.getElementById('cover').classList.add('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  document.getElementById('resultArea').classList.add('hidden');
+  buildJumpbar();
+  renderQuestion();
+}
+
+function backToCover(){
+  document.getElementById('quizArea').classList.add('hidden');
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('cover').classList.remove('hidden');
+}
+
+function buildJumpbar(){
+  const bar = document.getElementById('jumpbar');
+  bar.innerHTML = '';
+  FLAT.forEach((q,i)=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = (i+1);
+    b.id = 'jump-'+i;
+    b.onclick = (function(idx){ return function(){ current = idx; renderQuestion(); }; })(i);
+    bar.appendChild(b);
+  });
+}
+
+function updateJumpbar(){
+  FLAT.forEach((q,i)=>{
+    const b = document.getElementById('jump-'+i);
+    if(!b) return;
+    b.className = '';
+    if(i === current) b.classList.add('cur');
+    if(answered[i]){
+      if(answers[i] === q.ans) b.classList.add('done-ok');
+      else b.classList.add('done-ng');
+    }
+  });
+}
+
+function renderQuestion(){
+  const q = FLAT[current];
+  const label = q.source === 'kadai'
+    ? ('課題'+q.day+' ／ '+q.groupLabel)
+    : ('集中トレーニング ／ '+q.cat);
+  document.getElementById('sectName').textContent = label;
+  document.getElementById('progressText').textContent = (current+1)+' / '+FLAT.length;
+  document.getElementById('progressFill').style.width = ((current+1)/FLAT.length*100)+'%';
+
+  let html = '';
+  html += '<div class="qnum">問題 '+(current+1)+'</div>';
+  html += '<div class="qtext">'+q.q+'</div>';
+  html += '<div class="options" id="optionsWrap">';
+  q.opts.forEach((opt, i)=>{
+    html += '<div class="opt" data-idx="'+i+'" onclick="selectOption('+i+')">'
+      + '<div class="badge">'+(i+1)+'</div>'
+      + '<div>'+opt+'</div></div>';
+  });
+  html += '</div>';
+  html += '<div class="feedback" id="feedback"></div>';
+
+  document.getElementById('card').innerHTML = html;
+
+  if(answered[current]){
+    showFeedback(current, answers[current]);
+  }
+
+  document.getElementById('prevBtn').disabled = (current === 0);
+  document.getElementById('nextBtn').textContent = (current === FLAT.length-1) ? '結果を見る ✓' : '次へ →';
+  updateJumpbar();
+  window.scrollTo({top:0});
+}
+
+function selectOption(i){
+  if(answered[current]) return;
+  answers[current] = i;
+  answered[current] = true;
+  showFeedback(current, i);
+  updateJumpbar();
+}
+
+function showFeedback(qIdx, selectedIdx){
+  const q = FLAT[qIdx];
+  const opts = document.querySelectorAll('#optionsWrap .opt');
+  opts.forEach(o=>{
+    const idx = parseInt(o.dataset.idx);
+    o.classList.add('disabled');
+    if(idx === q.ans) o.classList.add('correct');
+    else if(idx === selectedIdx) o.classList.add('incorrect');
+    if(idx === selectedIdx) o.classList.add('selected');
+  });
+  const fb = document.getElementById('feedback');
+  const isCorrect = selectedIdx === q.ans;
+  fb.className = 'feedback show ' + (isCorrect ? 'ok' : 'ng');
+  // penjelasan + terjemahan Indonesia digabung di sini
+  let fbHtml = '<span class="tag">'+(isCorrect ? '✓ 正解！' : '✗ 不正解')+'</span>';
+  fbHtml += '正解は「'+(q.ans+1)+'. '+q.opts[q.ans]+'」<br><br>';
+  fbHtml += q.exp;
+  if(q.id){
+    fbHtml += '<div class="fb-id">🇮🇩 '+q.id+'</div>';
+  }
+  fb.innerHTML = fbHtml;
+}
+
+function goNext(){
+  if(current === FLAT.length-1){ showResult(); return; }
+  current++;
+  renderQuestion();
+}
+function goPrev(){
+  if(current === 0) return;
+  current--;
+  renderQuestion();
+}
+
+function showResult(){
+  document.getElementById('quizArea').classList.add('hidden');
+  document.getElementById('resultArea').classList.remove('hidden');
+
+  const total = FLAT.length;
+  const correct = FLAT.reduce((acc,q,i)=> acc+(answers[i]===q.ans?1:0), 0);
+  const pct = Math.round(correct/total*100);
+
+  document.getElementById('scorePct').textContent = pct+'%';
+  document.getElementById('scoreFrac').textContent = correct+' / '+total;
+
+  const circ = 2*Math.PI*64;
+  const ring = document.getElementById('ringFg');
+  ring.setAttribute('stroke-dasharray', circ);
+  ring.style.transition = 'stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)';
+  setTimeout(()=>{ ring.setAttribute('stroke-dashoffset', circ-(pct/100)*circ); }, 100);
+
+  let title, comment;
+  if(pct>=80){ title='素晴らしい！'; comment='N3レベルの語彙・表現がしっかり身についています。'; }
+  else if(pct>=60){ title='もう少しです'; comment='間違えた問題の解説を読んで、弱点を補強しましょう。'; }
+  else if(pct>=40){ title='伸びしろがあります'; comment='解説を見ながら、間違えたパターンを覚えていきましょう。'; }
+  else { title='これからが本番です'; comment='焦らず一つずつ、繰り返し復習していきましょう。'; }
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultComment').textContent = comment;
+}
+
+function showReview(){
+  const list = document.getElementById('reviewList');
+  list.classList.remove('hidden');
+  let html = '';
+  FLAT.forEach((q,i)=>{
+    const isCorrect = answers[i] === q.ans;
+    const userAns = answers[i]===null ? '(未回答)' : (answers[i]+1)+'. '+q.opts[answers[i]];
+    const label = q.source==='kadai' ? '課題'+q.day : q.cat;
+    html += '<div class="review-item">'
+      + '<div class="rq"><b>'+(i+1)+'. ('+label+')</b> '+q.q.replace(/<[^>]+>/g,'')+'</div>'
+      + '<div class="ra '+(isCorrect?'ok':'ng')+'">'+(isCorrect?'✓':'✗')+' あなたの答え: '+userAns+' ｜ 正解: '+(q.ans+1)+'. '+q.opts[q.ans]+'</div>'
+      + '<div class="ra" style="color:#5a534c;margin-top:4px;">'+q.exp+'</div>'
+      + (q.id ? '<div class="ra" style="color:#8a7d6a;margin-top:2px;font-style:italic;">🇮🇩 '+q.id+'</div>' : '')
+      + '</div>';
+  });
+  list.innerHTML = html;
+  list.scrollIntoView({behavior:'smooth'});
+}
+
+function restartQuiz(){
+  current = 0;
+  for(let i=0;i<FLAT.length;i++){ answers[i]=null; answered[i]=false; }
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('reviewList').classList.add('hidden');
+  document.getElementById('reviewList').innerHTML='';
+  document.getElementById('quizArea').classList.remove('hidden');
+  buildJumpbar();
+  renderQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  buildDayPicker();
+  buildCatPicker();
+  updateCoverInfo();
+});
+
+// expose to global scope for onclick handlers
+window.setTopTab = setTopTab;
+window.setKadaiMode = setKadaiMode;
+window.setTrainingMode = setTrainingMode;
+window.startQuiz = startQuiz;
+window.backToCover = backToCover;
+window.goPrev = goPrev;
+window.goNext = goNext;
+window.selectOption = selectOption;
+window.showReview = showReview;
+window.restartQuiz = restartQuiz;
+</script>
+</body>
+</html>
